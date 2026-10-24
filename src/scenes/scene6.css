@@ -10,6 +10,7 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background-color: #0d0204;
   opacity: 0;
@@ -210,6 +211,10 @@
   padding: 85px 20px 40px;
   box-sizing: border-box;
   z-index: 10;
+  max-height: 100vh;
+  max-height: 100dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .scene-6-closing-card {
@@ -350,6 +355,7 @@
   justify-content: center;
   gap: 8px;
   padding: 10px 24px;
+  min-height: 44px;
   background: linear-gradient(135deg, #7a1523 0%, #4a0c14 100%);
   color: #fae4a7;
   font-family: 'Cinzel', serif;
@@ -363,6 +369,7 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(212, 168, 83, 0.25);
   transition: all 0.25s ease;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .scene-6-replay-btn:hover {
@@ -642,7 +649,7 @@
 
 @media (max-width: 520px) {
   .scene-6-top-bar {
-    padding: 12px 10px 8px;
+    padding: max(12px, env(safe-area-inset-top)) 10px 8px;
   }
 
   .scene-6-stage-tag {
@@ -659,13 +666,27 @@
   }
 
   .scene-6-milestones-nav {
-    gap: 3px;
+    bottom: max(14px, env(safe-area-inset-bottom));
+    max-width: 96vw;
+    gap: 4px;
+    padding: 4px 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  .scene-6-milestones-nav::-webkit-scrollbar {
+    display: none;
   }
 
   .scene-6-milestone-pill {
-    padding: 3px 7px;
-    font-size: 0.62rem;
-    letter-spacing: 0.02em;
+    padding: 6px 10px;
+    font-size: 0.65rem;
+    letter-spacing: 0.03em;
+    min-height: 36px;
+    flex-shrink: 0;
   }
 
   .scene-6-pill-dot {
@@ -673,7 +694,7 @@
   }
 
   .scene-6-closing-wrap {
-    padding: 70px 14px 20px;
+    padding: max(70px, env(safe-area-inset-top)) 14px max(24px, env(safe-area-inset-bottom));
   }
 
   .scene-6-closing-headline {
@@ -695,8 +716,8 @@
   }
 
   .scene-6-replay-btn {
-    padding: 8px 18px;
-    font-size: 0.78rem;
+    padding: 10px 22px;
+    font-size: 0.82rem;
   }
 }
 

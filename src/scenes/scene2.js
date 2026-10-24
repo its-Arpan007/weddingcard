@@ -358,6 +358,14 @@ export function initScene2() {
     }
   };
 
+  const handleBack = () => {
+    if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
+      window.sceneManager.goToScene(1);
+    } else {
+      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 1 } }));
+    }
+  };
+
   if (scrollHint) {
     scrollHint.addEventListener('click', handleProceed);
     scrollHint.addEventListener('keydown', (e) => {
@@ -368,20 +376,45 @@ export function initScene2() {
     });
   }
 
-  // Also support mousewheel scroll down to advance to Scene 3
+  // Bidirectional mousewheel navigation (Scroll Down -> Scene 3, Scroll Up -> Scene 1)
   let scrollTimeout = null;
   const handleWheel = (e) => {
     if (e.deltaY > 30) {
       if (!scrollTimeout) {
         scrollTimeout = setTimeout(() => {
           handleProceed();
+          scrollTimeout = null;
+        }, 150);
+      }
+    } else if (e.deltaY < -30) {
+      if (!scrollTimeout) {
+        scrollTimeout = setTimeout(() => {
+          handleBack();
+          scrollTimeout = null;
         }, 150);
       }
     }
   };
   window.addEventListener('wheel', handleWheel, { passive: true });
-  activeTimers.push(scrollTimeout);
   window._scene2WheelHandler = handleWheel;
+
+  // Touch Swipe (Swipe Up -> Scene 3, Swipe Down -> Scene 1)
+  let touchStartY = 0;
+  window._scene2TouchStartHandler = (e) => {
+    if (e.touches && e.touches.length > 0) touchStartY = e.touches[0].clientY;
+  };
+  window._scene2TouchEndHandler = (e) => {
+    if (e.changedTouches && e.changedTouches.length > 0) {
+      const deltaY = touchStartY - e.changedTouches[0].clientY;
+      if (deltaY > 50) {
+        handleProceed();
+      } else if (deltaY < -50) {
+        handleBack();
+      }
+    }
+  };
+  window.addEventListener('touchstart', window._scene2TouchStartHandler, { passive: true });
+  window.addEventListener('touchend', window._scene2TouchEndHandler, { passive: true });
 }
 
 export function destroyScene2() {
@@ -391,5 +424,13 @@ export function destroyScene2() {
   if (window._scene2WheelHandler) {
     window.removeEventListener('wheel', window._scene2WheelHandler);
     window._scene2WheelHandler = null;
+  }
+  if (window._scene2TouchStartHandler) {
+    window.removeEventListener('touchstart', window._scene2TouchStartHandler);
+    window._scene2TouchStartHandler = null;
+  }
+  if (window._scene2TouchEndHandler) {
+    window.removeEventListener('touchend', window._scene2TouchEndHandler);
+    window._scene2TouchEndHandler = null;
   }
 }

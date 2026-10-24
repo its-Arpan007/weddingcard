@@ -3,6 +3,7 @@
  *
  * Manages scene transitions, lifecycle (create, init, destroy),
  * and provides a global navigation API.
+ * High-performance edition with zero-layout-thrash transitions.
  */
 
 import { createScene1, initScene1, destroyScene1 } from './scenes/scene1.js';
@@ -22,6 +23,7 @@ const scenes = {
 };
 
 let currentScene = null;
+const removalTimeouts = {};
 
 /**
  * Navigate to a scene by number.
@@ -39,6 +41,12 @@ function goToScene(sceneNum) {
     return;
   }
 
+  // Cancel any pending DOM removal for this target scene
+  if (removalTimeouts[sceneNum]) {
+    clearTimeout(removalTimeouts[sceneNum]);
+    delete removalTimeouts[sceneNum];
+  }
+
   const prevSceneNum = currentScene;
   currentScene = sceneNum;
 
@@ -50,30 +58,54 @@ function goToScene(sceneNum) {
     sceneEl = document.getElementById(`scene-${sceneNum}`);
   }
 
-  // Ensure active class triggers transition smoothly
+  // Smoothly activate new scene via requestAnimationFrame
   if (sceneEl) {
-    void sceneEl.offsetWidth;
-    sceneEl.classList.add('active');
+    sceneEl.style.opacity = '';
+    sceneEl.style.pointerEvents = '';
+    sceneEl.style.transition = '';
+    requestAnimationFrame(() => {
+      sceneEl.classList.add('active');
+    });
   }
 
   // Initialize the new scene
   sceneDef.init();
 
-  // Clean up previous scene gracefully after crossfade completes
+  // Stop previous scene's animation loops immediately to free up GPU & CPU during transition
   if (prevSceneNum && prevSceneNum !== sceneNum && scenes[prevSceneNum]) {
+    try {
+      scenes[prevSceneNum].destroy();
+    } catch {
+      // safe cleanup
+    }
+
     const prevEl = document.getElementById(`scene-${prevSceneNum}`);
     if (prevEl) {
       prevEl.classList.remove('active');
       prevEl.style.opacity = '0';
       prevEl.style.pointerEvents = 'none';
       prevEl.style.transition = 'opacity 0.4s ease-out';
+      
+      const sNum = prevSceneNum;
+      removalTimeouts[sNum] = setTimeout(() => {
+        if (currentScene !== sNum && prevEl.parentNode) {
+          prevEl.remove();
+        }
+        delete removalTimeouts[sNum];
+      }, 420);
     }
-    setTimeout(() => {
-      if (prevEl) {
-        prevEl.remove();
-      }
-      scenes[prevSceneNum].destroy();
-    }, 450);
+  }
+}
+
+function prevScene() {
+  if (currentScene > 1) {
+    goToScene(currentScene - 1);
+  }
+}
+
+function nextScene() {
+  if (currentScene < 6) {
+    goToScene(currentScene + 1);
   }
 }
 
@@ -86,7 +118,7 @@ export function initSceneManager() {
   if (!app) return;
 
   // Expose global API
-  window.sceneManager = { goToScene };
+  window.sceneManager = { goToScene, prevScene, nextScene, getCurrentScene: () => currentScene };
 
   // Listen for custom navigation events
   window.addEventListener('scene:navigate', (e) => {

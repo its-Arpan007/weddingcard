@@ -10,6 +10,7 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background-color: #1a0408;
   opacity: 0;
@@ -266,6 +267,12 @@
   opacity: 1;
   transform: translateY(0);
   transition-delay: 0.52s;
+}
+
+.scene-4.phase-c .scene-4-anim-5 {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.65s;
 }
 
 /* ─── A. Header & Devotional Badge ────────────────────────────────────────── */
@@ -663,6 +670,75 @@
   border-width: 0 2px 2px 0;
 }
 
+/* ─── D. Footer CTA & Scene 5 Handoff ─────────────────────────────────────── */
+
+.scene-4-cta-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 26px;
+}
+
+.scene-4-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 30px;
+  min-height: 44px;
+  background: linear-gradient(135deg, #7a1523 0%, #4a0c14 100%);
+  color: #fae4a7;
+  font-family: 'Cinzel', serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid rgba(212, 168, 83, 0.75);
+  border-radius: 28px;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 14px rgba(212, 168, 83, 0.25);
+  transition: all 0.25s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scene-4-cta-btn:hover {
+  background: linear-gradient(135deg, #8f1b2b 0%, #610e19 100%);
+  color: #fffdf5;
+  border-color: #f5cf68;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 207, 104, 0.45);
+}
+
+.scene-4-cta-btn:active {
+  transform: translateY(0);
+}
+
+.scene-4-cta-btn:focus-visible {
+  outline: 2px solid #f5cf68;
+  outline-offset: 4px;
+}
+
+.scene-4-cta-arrow {
+  font-size: 0.95rem;
+  animation: floatArrowS4 1.8s ease-in-out infinite;
+}
+
+@keyframes floatArrowS4 {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+.scene-4-scroll-hint {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #fcebd2;
+  opacity: 0.85;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
 
 
 /* ─── Continuity Light Bloom from Scene 3 ─────────────────────────────────── */
@@ -704,7 +780,7 @@
   }
 
   .scene-4-content-wrap {
-    padding: 24px 16px 48px;
+    padding: max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   }
 
   .scene-4-countdown-card {
@@ -713,20 +789,47 @@
 }
 
 @media (max-width: 480px) {
+  .scene-4-content-wrap {
+    padding: max(20px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+
   .scene-4-title {
     font-size: 1.65rem;
   }
 
   .scene-4-subtitle {
-    font-size: 1rem;
+    font-size: 0.98rem;
+  }
+
+  .scene-4-countdown-card {
+    padding: 10px 10px 10px;
+    border-radius: 12px;
+  }
+
+  .scene-4-countdown-title {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .scene-4-countdown-grid {
+    gap: 5px;
   }
 
   .scene-4-countdown-val {
-    font-size: 1.35rem;
+    font-size: 1.25rem;
+  }
+
+  .scene-4-countdown-lbl {
+    font-size: 0.52rem;
   }
 
   .scene-4-countdown-unit {
-    min-width: 46px;
+    min-width: 42px;
+    padding: 3px 4px;
+  }
+
+  .scene-4-countdown-sep {
+    font-size: 1.1rem;
   }
 
   .scene-4-event-title {
@@ -734,11 +837,16 @@
   }
 
   .scene-4-event-date {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
   }
 
   .scene-4-event-venue {
-    font-size: 1.05rem;
+    font-size: 1rem;
+  }
+
+  .scene-4-cta-btn {
+    padding: 10px 24px;
+    font-size: 0.86rem;
   }
 }
 

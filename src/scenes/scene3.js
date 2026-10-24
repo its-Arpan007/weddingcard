@@ -102,11 +102,16 @@ function drawParticles(ctx, canvas) {
       ctx.ellipse(0, 0, p.size * 1.5, p.size * 0.8, 0, 0, Math.PI * 2);
       ctx.fill();
     } else {
+      // Core sparkle
       ctx.fillStyle = `${p.color}${alpha})`;
-      ctx.shadowBlur = 6;
-      ctx.shadowColor = 'rgba(245, 207, 104, 0.8)';
       ctx.beginPath();
       ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Soft glow aura (Zero-CPU-blur hardware-accelerated replacement)
+      ctx.fillStyle = `${p.color}${alpha * 0.25})`;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size * 2, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -379,6 +384,22 @@ export function initScene3() {
     }, 1500);
   };
 
+  // Handle Return to Scene 2
+  const proceedToScene2 = () => {
+    if (isTransitioning) return;
+    isTransitioning = true;
+
+    if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
+      window.sceneManager.goToScene(2);
+    } else {
+      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 2 } }));
+    }
+
+    addSafeTimer(() => {
+      isTransitioning = false;
+    }, 1500);
+  };
+
   const nextBtn = document.getElementById('scene-3-next-btn');
   if (nextBtn) {
     nextBtn.addEventListener('click', proceedToScene4);
@@ -390,13 +411,25 @@ export function initScene3() {
     });
   }
 
-  // Support mousewheel scroll down to advance to Scene 4
+  // Support mousewheel scroll (Scroll Down -> Scene 4, Scroll Up -> Scene 2)
   let wheelTimeout = null;
   window._scene3WheelHandler = (e) => {
-    if (e.deltaY > 35 && !isTransitioning) {
+    if (isTransitioning) return;
+    const card = scene3.querySelector('.scene-3-card');
+    const isAtBottom = card ? card.scrollTop + card.clientHeight >= card.scrollHeight - 25 : true;
+    const isAtTop = card ? card.scrollTop <= 10 : true;
+
+    if (e.deltaY > 35 && isAtBottom) {
       if (!wheelTimeout) {
         wheelTimeout = setTimeout(() => {
           proceedToScene4();
+          wheelTimeout = null;
+        }, 150);
+      }
+    } else if (e.deltaY < -35 && isAtTop) {
+      if (!wheelTimeout) {
+        wheelTimeout = setTimeout(() => {
+          proceedToScene2();
           wheelTimeout = null;
         }, 150);
       }
@@ -404,7 +437,7 @@ export function initScene3() {
   };
   window.addEventListener('wheel', window._scene3WheelHandler, { passive: true });
 
-  // Support mobile touch swipe up to advance to Scene 4
+  // Support mobile touch swipe (Swipe Up -> Scene 4, Swipe Down -> Scene 2)
   let touchStartY = 0;
   window._scene3TouchStartHandler = (e) => {
     if (e.touches && e.touches.length > 0) {
@@ -414,11 +447,13 @@ export function initScene3() {
   window._scene3TouchEndHandler = (e) => {
     if (e.changedTouches && e.changedTouches.length > 0 && !isTransitioning) {
       const deltaY = touchStartY - e.changedTouches[0].clientY;
-      // If user swiped upwards significantly at bottom of card
       const card = scene3.querySelector('.scene-3-card');
-      const isAtBottom = card ? card.scrollTop + card.clientHeight >= card.scrollHeight - 20 : true;
+      const isAtBottom = card ? card.scrollTop + card.clientHeight >= card.scrollHeight - 25 : true;
+      const isAtTop = card ? card.scrollTop <= 10 : true;
       if (deltaY > 60 && isAtBottom) {
         proceedToScene4();
+      } else if (deltaY < -60 && isAtTop) {
+        proceedToScene2();
       }
     }
   };

@@ -10,6 +10,7 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background-color: #1a0408;
   opacity: 0;
@@ -561,6 +562,7 @@
   justify-content: center;
   gap: 10px;
   padding: 12px 30px;
+  min-height: 44px;
   background: linear-gradient(135deg, #7a1523 0%, #4a0c14 100%);
   color: #fae4a7;
   font-family: 'Cinzel', serif;
@@ -574,6 +576,7 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 14px rgba(212, 168, 83, 0.25);
   transition: all 0.25s ease;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .scene-5-cta-btn:hover {
@@ -651,17 +654,21 @@
   }
 
   .scene-5-content-wrap {
-    padding: 24px 16px 48px;
+    padding: max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   }
 }
 
 @media (max-width: 480px) {
+  .scene-5-content-wrap {
+    padding: max(20px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+
   .scene-5-title {
     font-size: 1.65rem;
   }
 
   .scene-5-subtitle {
-    font-size: 1rem;
+    font-size: 0.98rem;
   }
 
   .scene-5-couple-name {
@@ -678,6 +685,11 @@
 
   .scene-5-blessing-english {
     font-size: 0.95rem;
+  }
+
+  .scene-5-cta-btn {
+    padding: 10px 24px;
+    font-size: 0.86rem;
   }
 }
 

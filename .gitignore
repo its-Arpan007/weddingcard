@@ -1,4 +1,56 @@
-# Logs
+# ============================================
+# Dependencies & Package Managers
+# ============================================
+node_modules/
+*/node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ============================================
+# Production Builds & Outputs
+# ============================================
+dist/
+dist-ssr/
+build/
+out/
+*.local
+
+# ============================================
+# Vercel Deployment & Cloud
+# ============================================
+.vercel
+
+# ============================================
+# Caches & Temporary Files
+# ============================================
+.cache/
+.parcel-cache/
+.turbo/
+.vite/
+.eslintcache
+*.tsbuildinfo
+tmp/
+temp/
+
+# ============================================
+# Environment Variables & Secrets
+# ============================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+*.env.*
+
+# ============================================
+# Logs & Debugging
+# ============================================
 logs
 *.log
 npm-debug.log*
@@ -7,18 +59,55 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# ============================================
+# Operating System Files
+# ============================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 
-# Editor directories and files
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ============================================
+# IDEs & Code Editors
+# ============================================
+.idea/
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+!.vscode/settings.json
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swo
+*.swp
+
+# ============================================
+# Unnecessary Project Folders & Local Backups
+# ============================================
+# Unrelated nested sub-project
+Invitation-Card/
+
+# Local backup / recovery folders
+.backup_recovery/
+*.backup
+*.bak
+
+# Loose root image copies (actual production assets reside in public/)
+/s1_background.png
+/s1_background.webp
+/s1_petals_overlay.png
+/s1_petals_overlay.webp

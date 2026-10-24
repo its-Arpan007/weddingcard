@@ -157,10 +157,14 @@ function drawParticles(ctx, canvas) {
       ctx.fill();
     } else {
       ctx.fillStyle = `${p.color}${alpha})`;
-      ctx.shadowColor = 'rgba(250, 214, 115, 0.85)';
-      ctx.shadowBlur = 5;
       ctx.beginPath();
       ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Soft glow aura (Zero-CPU-blur hardware-accelerated replacement)
+      ctx.fillStyle = `${p.color}${alpha * 0.25})`;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size * 2, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.restore();
@@ -553,24 +557,75 @@ export function initScene6() {
     });
   }
 
+  // ─── Mousewheel Navigation in Scene 6 ─────────────────────────────────────
+  let wheelTimer = null;
+  const wheelHandler = (e) => {
+    if (Math.abs(e.deltaY) > 35 && !wheelTimer) {
+      wheelTimer = setTimeout(() => {
+        wheelTimer = null;
+      }, 250);
+
+      if (e.deltaY > 35) {
+        // Scroll Down -> Next Stage
+        if (currentStageIndex < FINALE_STAGES.length - 1) {
+          setStage(currentStageIndex + 1, true);
+        }
+      } else if (e.deltaY < -35) {
+        // Scroll Up -> Prev Stage, or Return to Scene 5
+        if (currentStageIndex > 0) {
+          setStage(currentStageIndex - 1, true);
+        } else {
+          if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
+            window.sceneManager.goToScene(5);
+          } else {
+            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5 } }));
+          }
+        }
+      }
+    }
+  };
+  window.addEventListener('wheel', wheelHandler, { passive: true });
+
   // ─── Mobile Swipe Gestures ───────────────────────────────────────────────
   let touchStartX = 0;
+  let touchStartY = 0;
   const touchStartHandler = (e) => {
     if (e.touches && e.touches.length > 0) {
       touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
     }
   };
   const touchEndHandler = (e) => {
     if (e.changedTouches && e.changedTouches.length > 0) {
       const deltaX = touchStartX - e.changedTouches[0].clientX;
-      if (deltaX > 50) {
-        // Swipe left -> Next stage
-        const target = Math.min(currentStageIndex + 1, FINALE_STAGES.length - 1);
-        setStage(target, true);
-      } else if (deltaX < -50) {
-        // Swipe right -> Prev stage
-        const target = Math.max(currentStageIndex - 1, 0);
-        setStage(target, true);
+      const deltaY = touchStartY - e.changedTouches[0].clientY;
+
+      if (Math.abs(deltaY) > Math.abs(deltaX)) {
+        // Vertical swipe
+        if (deltaY > 50) {
+          if (currentStageIndex < FINALE_STAGES.length - 1) {
+            setStage(currentStageIndex + 1, true);
+          }
+        } else if (deltaY < -50) {
+          if (currentStageIndex > 0) {
+            setStage(currentStageIndex - 1, true);
+          } else {
+            if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
+              window.sceneManager.goToScene(5);
+            } else {
+              window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5 } }));
+            }
+          }
+        }
+      } else {
+        // Horizontal swipe
+        if (deltaX > 50) {
+          const target = Math.min(currentStageIndex + 1, FINALE_STAGES.length - 1);
+          setStage(target, true);
+        } else if (deltaX < -50) {
+          const target = Math.max(currentStageIndex - 1, 0);
+          setStage(target, true);
+        }
       }
     }
   };
@@ -579,6 +634,7 @@ export function initScene6() {
 
   activeTimers.push(() => {
     if (keydownHandler) window.removeEventListener('keydown', keydownHandler);
+    window.removeEventListener('wheel', wheelHandler);
     window.removeEventListener('touchstart', touchStartHandler);
     window.removeEventListener('touchend', touchEndHandler);
   });

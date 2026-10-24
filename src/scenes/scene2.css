@@ -7,7 +7,12 @@
   position: absolute;
   inset: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
   overflow: hidden;
   background-color: #0d0206;
   opacity: 0;
@@ -369,19 +374,22 @@
 
 .scene-2-scroll-hint {
   margin-top: 0.22rem;
-  padding-top: 0.18rem;
+  padding: 6px 14px;
+  min-height: 44px;
   border-top: 1px solid rgba(212, 175, 55, 0.14);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
   font-family: 'Cinzel', serif;
-  font-size: clamp(0.56rem, 0.9vw, 0.64rem);
+  font-size: clamp(0.58rem, 0.9vw, 0.66rem);
   letter-spacing: 0.14em;
-  color: rgba(245, 207, 104, 0.8);
+  color: rgba(245, 207, 104, 0.85);
   cursor: pointer;
   transition: opacity 0.3s ease, color 0.3s ease;
   animation: scene2-hintBlink 2.5s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .scene-2-scroll-hint:hover {
@@ -567,7 +575,7 @@
 /* Mobile Portrait Viewports (<= 600px) */
 @media (max-width: 600px) {
   .scene-2-content {
-    padding: 0.65rem 0.6rem 0.35rem 0.6rem;
+    padding: max(0.65rem, env(safe-area-inset-top)) max(0.6rem, env(safe-area-inset-right)) max(0.35rem, env(safe-area-inset-bottom)) max(0.6rem, env(safe-area-inset-left));
   }
 
   .scene-2-badge {
@@ -586,15 +594,15 @@
   }
 
   .scene-2-img--ganesh {
-    height: clamp(270px, 49vh, 400px);
+    height: clamp(240px, 45vh, 380px);
     max-width: 92vw;
-    margin-bottom: clamp(10px, 2.6vh, 26px);
+    margin-bottom: clamp(10px, 2.2vh, 22px);
   }
 
   .scene-2-halo-wrap {
     width: min(280px, 68vw);
     height: min(280px, 68vw);
-    top: clamp(150px, 28vh, 220px);
+    top: clamp(140px, 26vh, 210px);
   }
 
   .scene-2-plaque {
@@ -626,10 +634,37 @@
   }
 
   .scene-2-scroll-hint {
-    margin-top: 0.18rem;
-    padding-top: 0.15rem;
+    margin-top: 0.15rem;
     font-size: 0.55rem;
     letter-spacing: 0.08em;
+  }
+}
+
+/* Extra Compact Phones & Short Viewports (<= 480px width or <= 680px height) */
+@media (max-width: 480px), (max-height: 680px) {
+  .scene-2-img--ganesh {
+    height: clamp(200px, 40vh, 310px);
+  }
+
+  .scene-2-halo-wrap {
+    width: min(240px, 62vw);
+    height: min(240px, 62vw);
+    top: clamp(120px, 24vh, 180px);
+  }
+
+  .scene-2-plaque {
+    padding: 0.3rem 0.65rem 0.25rem 0.65rem;
+    max-width: min(350px, 95vw);
+  }
+
+  .scene-2-shloka {
+    font-size: 0.74rem;
+    line-height: 1.32;
+  }
+
+  .scene-2-blessing {
+    font-size: 0.76rem;
+    line-height: 1.32;
   }
 }
 

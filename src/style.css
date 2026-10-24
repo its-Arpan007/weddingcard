@@ -16,6 +16,8 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  height: 100%;
 }
 
 body {
@@ -25,12 +27,16 @@ body {
   background: #0a0205;
   color: #f5e6d3;
   font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 #app {
   position: relative;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -43,7 +49,9 @@ body {
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: opacity;
+  transform: translateZ(0);
 }
 
 .scene.active {

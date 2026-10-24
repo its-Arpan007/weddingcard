@@ -134,10 +134,14 @@ function drawParticles(ctx, canvas) {
       ctx.fill();
     } else {
       ctx.fillStyle = `${p.color}${alpha})`;
-      ctx.shadowColor = 'rgba(245, 207, 104, 0.8)';
-      ctx.shadowBlur = 4;
       ctx.beginPath();
       ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Soft glow aura (Zero-CPU-blur hardware-accelerated replacement)
+      ctx.fillStyle = `${p.color}${alpha * 0.25})`;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size * 2, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.restore();
@@ -432,6 +436,22 @@ export function initScene5() {
     }, 1500);
   };
 
+  // ─── Scene 4 Navigation Return ────────────────────────────────────────────
+  const proceedToScene4 = () => {
+    if (isTransitioning) return;
+    isTransitioning = true;
+
+    if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
+      window.sceneManager.goToScene(4);
+    } else {
+      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 4 } }));
+    }
+
+    addSafeTimer(() => {
+      isTransitioning = false;
+    }, 1500);
+  };
+
   const nextBtn = document.getElementById('scene-5-next-btn');
   if (nextBtn) {
     nextBtn.addEventListener('click', proceedToScene6);
@@ -443,18 +463,27 @@ export function initScene5() {
     });
   }
 
-  // Mousewheel scroll down when reaching bottom of scrollable area
+  // Mousewheel scroll (Scroll Down -> Scene 6, Scroll Up -> Scene 4)
   let wheelTimer = null;
   const wheelHandler = (e) => {
-    if (e.deltaY > 35 && !isTransitioning) {
-      const scrollContainer = scene5.querySelector('.scene-5-scroll-container');
-      const isAtBottom = scrollContainer
-        ? scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 25
-        : true;
+    if (isTransitioning) return;
+    const scrollContainer = scene5.querySelector('.scene-5-scroll-container');
+    const isAtBottom = scrollContainer
+      ? scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 25
+      : true;
+    const isAtTop = scrollContainer ? scrollContainer.scrollTop <= 10 : true;
 
-      if (isAtBottom && !wheelTimer) {
+    if (e.deltaY > 35 && isAtBottom) {
+      if (!wheelTimer) {
         wheelTimer = setTimeout(() => {
           proceedToScene6();
+          wheelTimer = null;
+        }, 150);
+      }
+    } else if (e.deltaY < -35 && isAtTop) {
+      if (!wheelTimer) {
+        wheelTimer = setTimeout(() => {
+          proceedToScene4();
           wheelTimer = null;
         }, 150);
       }
@@ -462,7 +491,7 @@ export function initScene5() {
   };
   window.addEventListener('wheel', wheelHandler, { passive: true });
 
-  // Mobile touch swipe up when at bottom
+  // Mobile touch swipe (Swipe Up -> Scene 6, Swipe Down -> Scene 4)
   let touchStartY = 0;
   const touchStartHandler = (e) => {
     if (e.touches && e.touches.length > 0) {
@@ -476,9 +505,12 @@ export function initScene5() {
       const isAtBottom = scrollContainer
         ? scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 25
         : true;
+      const isAtTop = scrollContainer ? scrollContainer.scrollTop <= 10 : true;
 
       if (deltaY > 60 && isAtBottom) {
         proceedToScene6();
+      } else if (deltaY < -60 && isAtTop) {
+        proceedToScene4();
       }
     }
   };

@@ -13,6 +13,7 @@
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: #120407;
   opacity: 0;
@@ -146,7 +147,8 @@
   z-index: 10;
   width: 100%;
   max-width: 620px;
-  max-height: 94vh;
+  max-height: 92vh;
+  max-height: 92dvh;
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -170,7 +172,8 @@
 .scene-3-card {
   position: relative;
   width: 100%;
-  max-height: 90vh;
+  max-height: 88vh;
+  max-height: 88dvh;
   overflow-y: auto;
   overflow-x: hidden;
   background: radial-gradient(
@@ -795,9 +798,14 @@
   }
 
   .scene-3-cta-btn {
-    padding: 8px 20px;
-    font-size: 0.75rem;
+    padding: 10px 22px;
+    font-size: 0.76rem;
     letter-spacing: 0.07em;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* Reposition/fade flanking decorations on mobile so card is 100% readable */
@@ -814,6 +822,26 @@
   .scene-3-curtain--right {
     transform: translateX(15%);
     opacity: 0.75;
+  }
+}
+
+/* Extra Compact Mobile (<= 480px) */
+@media (max-width: 480px) {
+  .scene-3-card-container {
+    max-height: 92dvh;
+    padding: max(4px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .scene-3-name {
+    font-size: clamp(1.45rem, 5.8vw, 1.75rem);
+  }
+
+  .scene-3-card {
+    padding: 14px 12px 12px;
+  }
+
+  .scene-3-card-inner {
+    padding: 10px 10px 8px;
   }
 }
 

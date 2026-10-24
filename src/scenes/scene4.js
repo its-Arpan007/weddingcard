@@ -164,10 +164,14 @@ function drawParticles(ctx, canvas) {
       ctx.fill();
     } else {
       ctx.fillStyle = `${p.color}${alpha})`;
-      ctx.shadowColor = 'rgba(245, 207, 104, 0.8)';
-      ctx.shadowBlur = 4;
       ctx.beginPath();
       ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Soft glow aura (Zero-CPU-blur hardware-accelerated replacement)
+      ctx.fillStyle = `${p.color}${alpha * 0.25})`;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size * 2, 0, Math.PI * 2);
       ctx.fill();
     }
     ctx.restore();
@@ -403,6 +407,20 @@ export function createScene4() {
   ).join('')}
           </main>
 
+          <!-- D. Footer Action & Scene 5 Handoff -->
+          <footer class="scene-4-cta-wrap scene-4-anim-item scene-4-anim-5">
+            <button
+              id="scene-4-next-btn"
+              class="scene-4-cta-btn"
+              type="button"
+              aria-label="Proceed to Family Details"
+            >
+              <span>Meet the Families</span>
+              <span class="scene-4-cta-arrow" aria-hidden="true">▾</span>
+            </button>
+            <span class="scene-4-scroll-hint" aria-hidden="true">Scroll down or click to continue</span>
+          </footer>
+
         </div>
       </div>
 
@@ -509,21 +527,59 @@ export function initScene4() {
     btn.addEventListener('click', handleOpenMap);
   });
 
-  // ─── Natural Scroll & Touch Transition to Scene 5 ─────────────────────────
+  // ─── Scene 5 Navigation Handoff ───────────────────────────────────────────
+  const proceedToScene5 = () => {
+    if (isTransitioning) return;
+    isTransitioning = true;
+    if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
+      window.sceneManager.goToScene(5);
+    } else {
+      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5 } }));
+    }
+    addSafeTimer(() => {
+      isTransitioning = false;
+    }, 1500);
+  };
+
+  const nextBtn = document.getElementById('scene-4-next-btn');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', proceedToScene5);
+    nextBtn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        proceedToScene5();
+      }
+    });
+  }
+
+  // ─── Natural Scroll & Touch Transition (Down -> Scene 5, Up -> Scene 3) ───
   let wheelTimer = null;
   const wheelHandler = (e) => {
-    if (e.deltaY > 35 && !isTransitioning) {
-      const scrollContainer = scene4.querySelector('.scene-4-scroll-container');
-      const isAtBottom = scrollContainer
-        ? scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 25
-        : true;
+    if (isTransitioning) return;
+    const scrollContainer = scene4.querySelector('.scene-4-scroll-container');
+    const isAtBottom = scrollContainer
+      ? scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 25
+      : true;
+    const isAtTop = scrollContainer ? scrollContainer.scrollTop <= 10 : true;
 
-      if (isAtBottom && !wheelTimer) {
+    if (e.deltaY > 35 && isAtBottom) {
+      if (!wheelTimer) {
         wheelTimer = setTimeout(() => {
           if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
             window.sceneManager.goToScene(5);
           } else {
             window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5 } }));
+          }
+          wheelTimer = null;
+        }, 150);
+      }
+    } else if (e.deltaY < -35 && isAtTop) {
+      if (!wheelTimer) {
+        wheelTimer = setTimeout(() => {
+          if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
+            window.sceneManager.goToScene(3);
+          } else {
+            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3 } }));
           }
           wheelTimer = null;
         }, 150);
@@ -543,11 +599,19 @@ export function initScene4() {
       const isAtBottom = scrollContainer
         ? scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 25
         : true;
+      const isAtTop = scrollContainer ? scrollContainer.scrollTop <= 10 : true;
+
       if (deltaY > 60 && isAtBottom) {
         if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
           window.sceneManager.goToScene(5);
         } else {
           window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5 } }));
+        }
+      } else if (deltaY < -60 && isAtTop) {
+        if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
+          window.sceneManager.goToScene(3);
+        } else {
+          window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3 } }));
         }
       }
     }
