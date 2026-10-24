@@ -37,19 +37,19 @@
   pointer-events: none;
 }
 
+.scene-5-bg-picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .scene-5-bg-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center bottom;
-  transform: scale(1.03);
-  transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
   opacity: 0.88;
-}
-
-.scene-5.phase-a .scene-5-bg-img {
-  transform: scale(1);
-  opacity: 1;
+  will-change: transform, opacity;
 }
 
 /* Atmospheric warm sunset vignette */
@@ -80,21 +80,22 @@
   overflow: hidden;
 }
 
+.scene-5-arch-picture {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 100%;
+}
+
 .scene-5-arch-img {
   max-height: 88vh;
   width: auto;
   max-width: 96vw;
   object-fit: contain;
   object-position: center bottom;
-  opacity: 0;
-  transform: translateY(35px) scale(0.97);
-  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.85));
-}
-
-.scene-5.phase-b .scene-5-arch-img {
   opacity: 0.86;
-  transform: translateY(0) scale(1);
+  filter: drop-shadow(0 20px 45px rgba(0, 0, 0, 0.85));
+  will-change: transform, opacity;
 }
 
 .scene-5-arch-glow {
@@ -160,51 +161,6 @@
   box-sizing: border-box;
 }
 
-/* ─── Entrance Animations ─────────────────────────────────────────────────── */
-
-.scene-5-anim-item {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
-}
-
-.scene-5.phase-c .scene-5-anim-1 {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.05s;
-}
-
-.scene-5.phase-c .scene-5-anim-2 {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.2s;
-}
-
-.scene-5.phase-c .scene-5-anim-3 {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.32s;
-}
-
-.scene-5.phase-c .scene-5-anim-4 {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.44s;
-}
-
-.scene-5.phase-d .scene-5-anim-5 {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.15s;
-}
-
-.scene-5.phase-d .scene-5-anim-6 {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 0.28s;
-}
-
 /* ─── A. Header & Devotional Badge ────────────────────────────────────────── */
 
 .scene-5-header {
@@ -212,6 +168,7 @@
   margin-bottom: 14px;
   width: 100%;
   max-width: 720px;
+  will-change: transform, opacity;
 }
 
 .scene-5-devotional-tag {
@@ -296,6 +253,7 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  will-change: transform, opacity;
 }
 
 .scene-5-family-card:hover {
@@ -449,6 +407,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  will-change: transform, opacity;
 }
 
 .scene-5-knot-circle {
@@ -525,6 +484,7 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  will-change: transform, opacity;
 }
 
 .scene-5-shloka-text {
@@ -554,6 +514,7 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  will-change: transform, opacity;
 }
 
 .scene-5-cta-btn {
@@ -562,7 +523,7 @@
   justify-content: center;
   gap: 10px;
   padding: 12px 30px;
-  min-height: 44px;
+  min-height: 48px;
   background: linear-gradient(135deg, #7a1523 0%, #4a0c14 100%);
   color: #fae4a7;
   font-family: 'Cinzel', serif;
@@ -698,7 +659,6 @@
 @media (prefers-reduced-motion: reduce) {
   .scene-5-bg-img,
   .scene-5-arch-img,
-  .scene-5-anim-item,
   .scene-5-incoming-bloom,
   .scene-5-family-card,
   .scene-5-knot-circle {

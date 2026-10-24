@@ -12,9 +12,16 @@
  */
 
 import './scene2.css';
+import { gsap } from 'gsap';
 
 /** @type {number[]} */
 let activeTimers = [];
+
+/** @type {gsap.Context | null} */
+let gsapCtx = null;
+
+/** @type {Function | null} */
+let parallaxMoveHandler = null;
 
 /** @type {number} */
 let particleAnimFrame = 0;
@@ -129,13 +136,19 @@ export function createScene2() {
            LAYER 1: Palace Sunset Background
            ============================================== -->
       <div class="scene-2-layer scene-2-layer--bg" aria-hidden="true">
-        <img
-          src="/assets/scene-2/s2_background.png"
-          alt=""
-          class="scene-2-img scene-2-img--bg"
-          loading="eager"
-          draggable="false"
-        />
+        <picture>
+          <source srcset="/assets/scene-2/s2_background.webp" type="image/webp" />
+          <img
+            src="/assets/scene-2/s2_background.png"
+            alt=""
+            class="scene-2-img scene-2-img--bg"
+            loading="eager"
+            decoding="async"
+            width="1672"
+            height="941"
+            draggable="false"
+          />
+        </picture>
       </div>
 
       <!-- Atmospheric Sunset Vignette -->
@@ -145,13 +158,19 @@ export function createScene2() {
            LAYER 2: Temple Arch and Architectural Frame
            ============================================== -->
       <div class="scene-2-layer scene-2-layer--arch" aria-hidden="true">
-        <img
-          src="/assets/scene-2/s2_temple_arch.png"
-          alt=""
-          class="scene-2-img scene-2-img--arch"
-          loading="eager"
-          draggable="false"
-        />
+        <picture>
+          <source srcset="/assets/scene-2/s2_temple_arch.webp" type="image/webp" />
+          <img
+            src="/assets/scene-2/s2_temple_arch.png"
+            alt=""
+            class="scene-2-img scene-2-img--arch"
+            loading="eager"
+            decoding="async"
+            width="1672"
+            height="941"
+            draggable="false"
+          />
+        </picture>
       </div>
 
       <!-- ==============================================
@@ -219,26 +238,38 @@ export function createScene2() {
            LAYER 4: Hanging Bells and Floral Garlands
            ============================================== -->
       <div class="scene-2-layer scene-2-layer--bells" aria-hidden="true">
-        <img
-          src="/assets/scene-2/s2_bells_garlands.png"
-          alt=""
-          class="scene-2-img scene-2-img--bells"
-          loading="eager"
-          draggable="false"
-        />
+        <picture>
+          <source srcset="/assets/scene-2/s2_bells_garlands.webp" type="image/webp" />
+          <img
+            src="/assets/scene-2/s2_bells_garlands.png"
+            alt=""
+            class="scene-2-img scene-2-img--bells"
+            loading="eager"
+            decoding="async"
+            width="1672"
+            height="941"
+            draggable="false"
+          />
+        </picture>
       </div>
 
       <!-- ==============================================
            LAYER 5: Central Deity — Lord Ganesha on Pedestal
            ============================================== -->
       <div class="scene-2-layer scene-2-layer--ganesh" role="img" aria-label="Lord Ganesha seated on an ornate golden lotus pedestal in temple sanctuary">
-        <img
-          src="/assets/scene-2/s2_ganesh_pedestal.png"
-          alt="Lord Ganesha"
-          class="scene-2-img scene-2-img--ganesh"
-          loading="eager"
-          draggable="false"
-        />
+        <picture>
+          <source srcset="/assets/scene-2/s2_ganesh_pedestal.webp" type="image/webp" />
+          <img
+            src="/assets/scene-2/s2_ganesh_pedestal.png"
+            alt="Lord Ganesha"
+            class="scene-2-img scene-2-img--ganesh"
+            loading="eager"
+            decoding="async"
+            width="1366"
+            height="1152"
+            draggable="false"
+          />
+        </picture>
         <div class="scene-2-pedestal-glow" aria-hidden="true"></div>
       </div>
 
@@ -246,13 +277,19 @@ export function createScene2() {
            LAYER 6: Foreground Tiered Steps with Glowing Diyas
            ============================================== -->
       <div class="scene-2-layer scene-2-layer--diya" aria-hidden="true">
-        <img
-          src="/assets/scene-2/s2_diya_foreground.png"
-          alt=""
-          class="scene-2-img scene-2-img--diya"
-          loading="eager"
-          draggable="false"
-        />
+        <picture>
+          <source srcset="/assets/scene-2/s2_diya_foreground.webp" type="image/webp" />
+          <img
+            src="/assets/scene-2/s2_diya_foreground.png"
+            alt=""
+            class="scene-2-img scene-2-img--diya"
+            loading="eager"
+            decoding="async"
+            width="1671"
+            height="941"
+            draggable="false"
+          />
+        </picture>
         <!-- Ambient warm flicker across foreground lamps -->
         <div class="scene-2-diya-flicker-layer" aria-hidden="true"></div>
       </div>
@@ -320,6 +357,79 @@ export function initScene2() {
 
   scene2.classList.add('active');
 
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Scoped GSAP Orchestration for Scene 2
+  gsapCtx = gsap.context(() => {
+    if (!prefersReducedMotion) {
+      const tl = gsap.timeline();
+
+      // Natural sequence: Background -> Header -> Arch -> Halo -> Bells -> Deity on Pedestal -> Foreground Diyas -> Sanskrit Plaque
+      tl.fromTo('.scene-2-img--bg',
+        { opacity: 0, scale: 1.05 },
+        { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }
+      )
+      .fromTo('.scene-2-header',
+        { opacity: 0, y: -22 },
+        { opacity: 1, y: 0, duration: 0.85, ease: 'power2.out' },
+        '-=0.85'
+      )
+      .fromTo('.scene-2-img--arch',
+        { opacity: 0, y: -42 },
+        { opacity: 1, y: 0, duration: 1.1, ease: 'power2.out' },
+        '-=0.65'
+      )
+      .fromTo('.scene-2-halo-wrap',
+        { opacity: 0, scale: 0.65 },
+        { opacity: 0.75, scale: 1, duration: 1.0, ease: 'back.out(1.4)' },
+        '-=0.75'
+      )
+      .fromTo('.scene-2-img--bells',
+        { opacity: 0, y: -30 },
+        { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' },
+        '-=0.75'
+      )
+      .fromTo('.scene-2-img--ganesh',
+        { opacity: 0, y: 35, scale: 0.94 },
+        { opacity: 1, y: 0, scale: 1, duration: 1.25, ease: 'power2.out' },
+        '-=0.75'
+      )
+      .fromTo('.scene-2-img--diya',
+        { opacity: 0, y: 22 },
+        { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' },
+        '-=0.85'
+      )
+      .fromTo('.scene-2-plaque',
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' },
+        '-=0.6'
+      );
+
+      // Interactive Layered Parallax on desktop/tablet
+      const archEl = scene2.querySelector('.scene-2-layer--arch');
+      const ganeshEl = scene2.querySelector('.scene-2-img--ganesh');
+      const bellsEl = scene2.querySelector('.scene-2-img--bells');
+      const diyaEl = scene2.querySelector('.scene-2-img--diya');
+
+      const quickArchX = archEl ? gsap.quickTo(archEl, 'x', { duration: 0.8, ease: 'power1.out' }) : null;
+      const quickGaneshX = ganeshEl ? gsap.quickTo(ganeshEl, 'x', { duration: 0.9, ease: 'power1.out' }) : null;
+      const quickBellsX = bellsEl ? gsap.quickTo(bellsEl, 'x', { duration: 0.7, ease: 'power1.out' }) : null;
+      const quickDiyaX = diyaEl ? gsap.quickTo(diyaEl, 'x', { duration: 0.6, ease: 'power1.out' }) : null;
+
+      parallaxMoveHandler = (e) => {
+        const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : window.innerWidth / 2);
+        const normX = (clientX / window.innerWidth) * 2 - 1;
+
+        if (quickArchX) quickArchX(normX * 8);
+        if (quickGaneshX) quickGaneshX(normX * 14);
+        if (quickBellsX) quickBellsX(normX * 18);
+        if (quickDiyaX) quickDiyaX(normX * 22);
+      };
+
+      window.addEventListener('mousemove', parallaxMoveHandler, { passive: true });
+    }
+  }, '#scene-2');
+
   // Fade out incoming golden light bloom
   const bloom = scene2.querySelector('.scene-2-golden-bloom');
   if (bloom) {
@@ -342,7 +452,6 @@ export function initScene2() {
       particleAnimFrame = requestAnimationFrame(animationLoop);
     };
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!prefersReducedMotion) {
       animationLoop();
     }
@@ -421,6 +530,17 @@ export function destroyScene2() {
   clearAllTimers();
   cancelAnimationFrame(particleAnimFrame);
   ambientParticles = [];
+
+  if (parallaxMoveHandler) {
+    window.removeEventListener('mousemove', parallaxMoveHandler);
+    parallaxMoveHandler = null;
+  }
+
+  if (gsapCtx) {
+    gsapCtx.revert();
+    gsapCtx = null;
+  }
+
   if (window._scene2WheelHandler) {
     window.removeEventListener('wheel', window._scene2WheelHandler);
     window._scene2WheelHandler = null;

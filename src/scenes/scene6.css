@@ -354,17 +354,17 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 24px;
-  min-height: 44px;
+  padding: 12px 28px;
+  min-height: 48px;
   background: linear-gradient(135deg, #7a1523 0%, #4a0c14 100%);
   color: #fae4a7;
   font-family: 'Cinzel', serif;
-  font-size: 0.84rem;
+  font-size: 0.88rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border: 1px solid rgba(212, 168, 83, 0.75);
-  border-radius: 24px;
+  border-radius: 26px;
   cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(212, 168, 83, 0.25);
   transition: all 0.25s ease;
@@ -513,19 +513,21 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
+  padding: 6px 14px;
+  min-height: 44px;
   background: transparent;
   color: #e6c99c;
   font-family: 'Cinzel', serif;
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   border: 1px solid transparent;
-  border-radius: 16px;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.25s ease;
   user-select: none;
+  box-sizing: border-box;
 }
 
 .scene-6-pill-dot {
@@ -560,8 +562,8 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: rgba(30, 5, 10, 0.65);
   border: 1px solid rgba(212, 168, 83, 0.5);
@@ -630,8 +632,9 @@
   }
 
   .scene-6-milestone-pill {
-    padding: 4px 9px;
+    padding: 6px 10px;
     font-size: 0.68rem;
+    min-height: 44px;
   }
 
   .scene-6-procession-wrap {
@@ -666,10 +669,9 @@
   }
 
   .scene-6-milestones-nav {
-    bottom: max(14px, env(safe-area-inset-bottom));
     max-width: 96vw;
-    gap: 4px;
-    padding: 4px 8px;
+    gap: 3px;
+    padding: 3px 4px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -682,10 +684,10 @@
   }
 
   .scene-6-milestone-pill {
-    padding: 6px 10px;
-    font-size: 0.65rem;
-    letter-spacing: 0.03em;
-    min-height: 36px;
+    padding: 6px 8px;
+    font-size: 0.62rem;
+    letter-spacing: 0.02em;
+    min-height: 44px;
     flex-shrink: 0;
   }
 
@@ -694,11 +696,11 @@
   }
 
   .scene-6-closing-wrap {
-    padding: max(70px, env(safe-area-inset-top)) 14px max(24px, env(safe-area-inset-bottom));
+    padding: max(75px, env(safe-area-inset-top)) 14px max(24px, env(safe-area-inset-bottom));
   }
 
   .scene-6-closing-headline {
-    font-size: 1.3rem;
+    font-size: 1.28rem;
   }
 
   .scene-6-closing-thanks {
@@ -711,13 +713,14 @@
   }
 
   .scene-6-closing-couple {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     margin-bottom: 14px;
   }
 
   .scene-6-replay-btn {
-    padding: 10px 22px;
-    font-size: 0.82rem;
+    padding: 12px 24px;
+    font-size: 0.84rem;
+    min-height: 48px;
   }
 }
 

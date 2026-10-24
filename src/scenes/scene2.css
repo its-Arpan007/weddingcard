@@ -77,7 +77,6 @@
   object-position: center bottom;
   opacity: 1;
   filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.45));
-  animation: scene2-archReveal 1.0s cubic-bezier(0.2, 0.9, 0.3, 1) 0s forwards;
 }
 
 /* ============================================
@@ -96,7 +95,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: scene2-haloReveal 1.0s cubic-bezier(0.2, 0.9, 0.3, 1) 0s forwards;
 }
 
 .scene-2-halo-glow {
@@ -129,9 +127,7 @@
   object-position: center bottom;
   transform-origin: 50% 0%;
   opacity: 1;
-  animation:
-    scene2-bellsReveal 1.0s cubic-bezier(0.2, 0.9, 0.3, 1) 0s forwards,
-    scene2-bellsSway 7s ease-in-out 1.2s infinite alternate;
+  animation: scene2-bellsSway 7s ease-in-out infinite alternate;
 }
 
 /* ============================================
@@ -148,7 +144,6 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  animation: scene2-ganeshReveal 1.2s cubic-bezier(0.2, 0.9, 0.3, 1) 0s forwards;
 }
 
 .scene-2-img--ganesh {
@@ -196,7 +191,6 @@
   object-fit: cover;
   object-position: center bottom;
   opacity: 1;
-  animation: scene2-diyaReveal 1.1s cubic-bezier(0.2, 0.9, 0.3, 1) 0.05s forwards;
 }
 
 /* Warm flicker overlay across foreground lamps */
@@ -243,9 +237,6 @@
   text-align: center;
   max-width: 760px;
   width: 100%;
-  opacity: 0;
-  transform: translateY(-14px);
-  animation: scene2-slideDown 1.0s cubic-bezier(0.2, 0.9, 0.3, 1) 0.1s forwards;
   pointer-events: auto;
 }
 
@@ -314,9 +305,6 @@
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   padding: 0.48rem 1.3rem 0.4rem 1.3rem;
-  opacity: 0;
-  transform: translateY(14px);
-  animation: scene2-slideUp 0.9s cubic-bezier(0.2, 0.9, 0.3, 1) 0.22s forwards;
   pointer-events: auto;
 }
 

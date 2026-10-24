@@ -3,14 +3,18 @@
  *
  * Cinematic Indian Wedding Family Reveal
  * Layered Architecture:
- * Layer 1: Palace Sunset Courtyard with Pool & Lamps (s5_bg_desktop.png)
- * Layer 2: Grand Carved Marble Family Arch with Domed Pavilions (s5_family_arch_01.png)
+ * Layer 1: Palace Sunset Courtyard with Pool & Lamps (s5_bg_desktop.webp / png)
+ * Layer 2: Grand Carved Marble Family Arch with Domed Pavilions (s5_family_arch_01.webp / png)
  * Layer 3: Ambient Floating Rose Petals & Golden Sparkles Canvas
  * Layer 4: Content Interface — Royal Header, Bride & Groom Family Panels, Blessings & CTA
  * Layer 5: Incoming Light Bloom for Scene 4 Continuity
  */
 
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './scene5.css';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /**
  * Exact Verified Family Details (Source of Truth)
@@ -51,6 +55,9 @@ let particleCtx = null;
 /** @type {boolean} */
 let isTransitioning = false;
 
+/** @type {gsap.Context | null} */
+let gsapCtx = null;
+
 // Stored resize handler for cleanup
 let resizeHandler = null;
 
@@ -63,7 +70,7 @@ function addSafeTimer(fn, delay) {
 function clearAllTimers() {
   activeTimers.forEach((item) => {
     if (typeof item === 'function') {
-      try { item(); } catch (_) {}
+      try { item(); } catch {}
     } else {
       clearTimeout(item);
     }
@@ -95,7 +102,7 @@ function createParticle(canvas) {
 
 function initParticles(canvas) {
   ambientParticles = [];
-  const count = window.innerWidth < 640 ? 30 : 55;
+  const count = window.innerWidth < 640 ? 25 : 45;
   for (let i = 0; i < count; i++) {
     ambientParticles.push(createParticle(canvas));
   }
@@ -138,7 +145,7 @@ function drawParticles(ctx, canvas) {
       ctx.arc(0, 0, p.size, 0, Math.PI * 2);
       ctx.fill();
 
-      // Soft glow aura (Zero-CPU-blur hardware-accelerated replacement)
+      // Soft glow aura
       ctx.fillStyle = `${p.color}${alpha * 0.25})`;
       ctx.beginPath();
       ctx.arc(0, 0, p.size * 2, 0, Math.PI * 2);
@@ -168,23 +175,33 @@ export function createScene5() {
 
       <!-- Layer 1: Palace Sunset Courtyard with Pool & Lamps -->
       <div class="scene-5-bg-layer" aria-hidden="true">
-        <img
-          src="/assets/scene-5/s5_bg_desktop.png"
-          alt=""
-          class="scene-5-bg-img"
-          draggable="false"
-        />
+        <picture class="scene-5-bg-picture">
+          <source srcset="/assets/scene-5/s5_bg_desktop.webp" type="image/webp" />
+          <img
+            src="/assets/scene-5/s5_bg_desktop.png"
+            width="1024"
+            height="576"
+            alt=""
+            class="scene-5-bg-img"
+            draggable="false"
+          />
+        </picture>
         <div class="scene-5-bg-vignette"></div>
       </div>
 
-      <!-- Layer 2: Grand Carved Marble Family Arch (Selected Arch 01 with native transparency) -->
+      <!-- Layer 2: Grand Carved Marble Family Arch -->
       <div class="scene-5-arch-layer" aria-hidden="true">
-        <img
-          src="/assets/scene-5/s5_family_arch_01.png"
-          alt=""
-          class="scene-5-arch-img"
-          draggable="false"
-        />
+        <picture class="scene-5-arch-picture">
+          <source srcset="/assets/scene-5/s5_family_arch_01.webp" type="image/webp" />
+          <img
+            src="/assets/scene-5/s5_family_arch_01.png"
+            width="960"
+            height="880"
+            alt=""
+            class="scene-5-arch-img"
+            draggable="false"
+          />
+        </picture>
         <div class="scene-5-arch-glow"></div>
       </div>
 
@@ -356,34 +373,46 @@ export function initScene5() {
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (prefersReducedMotion) {
-    scene5.classList.add('phase-a', 'phase-b', 'phase-c', 'phase-d', 'phase-settled');
-  } else {
-    // Phase A: Background reveal (0-200ms)
-    addSafeTimer(() => {
-      scene5.classList.add('phase-a');
-    }, 60);
-
-    // Phase B: Grand family arch reveal (280ms)
-    addSafeTimer(() => {
-      scene5.classList.add('phase-b');
-    }, 280);
-
-    // Phase C: Coordinated header & family cards sequence (550ms)
-    addSafeTimer(() => {
-      scene5.classList.add('phase-c');
-    }, 550);
-
-    // Phase D: Devotional blessing & CTA button (850ms)
-    addSafeTimer(() => {
-      scene5.classList.add('phase-d');
-    }, 850);
-
-    // Phase E: Settled stable scene (1250ms)
-    addSafeTimer(() => {
-      scene5.classList.add('phase-settled');
-    }, 1250);
+  // ─── GSAP Scoped Entrance Timeline & Parallax ─────────────────────────────
+  if (gsapCtx) {
+    gsapCtx.revert();
+    gsapCtx = null;
   }
+
+  gsapCtx = gsap.context(() => {
+    if (prefersReducedMotion) {
+      gsap.set(
+        ['.scene-5-bg-img', '.scene-5-arch-img', '.scene-5-anim-item', '.scene-5-family-card', '.scene-5-center-knot'],
+        { opacity: 1, y: 0, x: 0, scale: 1 }
+      );
+      return;
+    }
+
+    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+    tl.fromTo('.scene-5-bg-img', { scale: 1.04, opacity: 0.6 }, { scale: 1, opacity: 1, duration: 1.1 }, 0)
+      .fromTo('.scene-5-arch-img', { y: 35, opacity: 0, scale: 0.96 }, { y: 0, opacity: 0.86, scale: 1, duration: 1 }, 0.15)
+      .fromTo('.scene-5-header', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.75 }, 0.3)
+      .fromTo('.scene-5-family-card--bride', { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8 }, 0.45)
+      .fromTo('.scene-5-family-card--groom', { x: 30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.8 }, 0.45)
+      .fromTo('.scene-5-center-knot', { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6 }, 0.6)
+      .fromTo('.scene-5-blessing-quote', { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, 0.75)
+      .fromTo('.scene-5-cta-wrap', { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55 }, 0.9);
+
+    // Subtle scroll parallax for the marble family arch
+    if (scrollContainer) {
+      ScrollTrigger.create({
+        trigger: '.scene-5-content-wrap',
+        scroller: scrollContainer,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.5,
+        onUpdate: (self) => {
+          gsap.to('.scene-5-arch-img', { y: self.progress * 35, overwrite: 'auto', duration: 0.15 });
+        },
+      });
+    }
+  }, scene5);
 
   // Dissolve incoming golden bloom smoothly
   const bloom = scene5.querySelector('.scene-5-incoming-bloom');
@@ -467,7 +496,6 @@ export function initScene5() {
   let wheelTimer = null;
   const wheelHandler = (e) => {
     if (isTransitioning) return;
-    const scrollContainer = scene5.querySelector('.scene-5-scroll-container');
     const isAtBottom = scrollContainer
       ? scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 25
       : true;
@@ -501,7 +529,6 @@ export function initScene5() {
   const touchEndHandler = (e) => {
     if (e.changedTouches && e.changedTouches.length > 0 && !isTransitioning) {
       const deltaY = touchStartY - e.changedTouches[0].clientY;
-      const scrollContainer = scene5.querySelector('.scene-5-scroll-container');
       const isAtBottom = scrollContainer
         ? scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 25
         : true;
@@ -529,6 +556,11 @@ export function destroyScene5() {
   cancelAnimationFrame(particleAnimFrame);
   ambientParticles = [];
   isTransitioning = false;
+
+  if (gsapCtx) {
+    gsapCtx.revert();
+    gsapCtx = null;
+  }
 
   if (resizeHandler) {
     window.removeEventListener('resize', resizeHandler);

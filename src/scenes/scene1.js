@@ -5,6 +5,7 @@
  */
 
 import './scene1.css';
+import { gsap } from 'gsap';
 
 /** @type {boolean} */
 let isOpen = false;
@@ -17,6 +18,9 @@ let isTransitioning = false;
 
 /** @type {boolean} */
 let isDestroyed = false;
+
+/** @type {gsap.Context | null} */
+let gsapCtx = null;
 
 /** @type {number[]} */
 let activeTimers = [];
@@ -241,13 +245,25 @@ function showWeddingTitleStage() {
   const envelopeStage = document.getElementById('scene-1-envelope-stage');
   const titleStage = document.getElementById('wedding-title-stage');
 
-  if (envelopeStage) {
-    envelopeStage.classList.add('fading');
-  }
-
   if (titleStage) {
     titleStage.setAttribute('aria-hidden', 'false');
     titleStage.classList.add('active');
+  }
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (prefersReducedMotion) {
+    if (envelopeStage) envelopeStage.classList.add('fading');
+  } else {
+    const tl = gsap.timeline();
+    if (envelopeStage) {
+      tl.to(envelopeStage, { opacity: 0, scale: 1.03, duration: 0.7, ease: 'power2.inOut' });
+    }
+    tl.fromTo('.wedding-title-badge', { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '-=0.3')
+      .fromTo('.wedding-title-divider', { opacity: 0, scaleX: 0.5 }, { opacity: 1, scaleX: 1, duration: 0.7, ease: 'power2.out' }, '-=0.4')
+      .fromTo('.wedding-title-main', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, '-=0.5')
+      .fromTo('.wedding-title-sub', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '-=0.5')
+      .fromTo('.wedding-title-lotus', { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.5)' }, '-=0.4');
   }
 
   // Display Wedding Title Screen comfortably for ~3.8 seconds, then advance
@@ -925,9 +941,10 @@ export function initScene1() {
     { radiusX: 0.31, radiusY: 0.21, speed: 0.015, phase: 4.2, tilt: -0.35, fg: true, width: 2.2 },
   ];
 
-  // Golden Sparkles
+  // Golden Sparkles (Adaptive count: 28 on mobile, 55 on desktop)
   sparkles = [];
-  const SPARKLE_COUNT = 65; // High aesthetic density with zero GPU frame drops
+  const isMobileScreen = window.innerWidth < 640;
+  const SPARKLE_COUNT = isMobileScreen ? 28 : 55;
   for (let i = 0; i < SPARKLE_COUNT; i++) {
     sparkles.push({
       x: Math.random() * cw,
@@ -942,9 +959,9 @@ export function initScene1() {
     });
   }
 
-  // Drifting Rose Petals
+  // Drifting Rose Petals (Adaptive count: 7 on mobile, 14 on desktop)
   petals = [];
-  const PETAL_COUNT = 14;
+  const PETAL_COUNT = isMobileScreen ? 7 : 14;
   for (let i = 0; i < PETAL_COUNT; i++) {
     petals.push({
       x: Math.random() * cw,
@@ -1065,6 +1082,20 @@ export function initScene1() {
     animFrameId = requestAnimationFrame(animateLoop);
   }
 
+  // Scoped GSAP Animations for Scene 1
+  gsapCtx = gsap.context(() => {
+    if (!prefersReducedMotion) {
+      gsap.fromTo('#envelope-float-rig',
+        { opacity: 0, scale: 0.93, y: 22 },
+        { opacity: 1, scale: 1, y: 0, duration: 1.05, ease: 'power2.out' }
+      );
+      gsap.fromTo('#envelope-hint',
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.8, delay: 0.5, ease: 'power2.out' }
+      );
+    }
+  }, '#scene-1');
+
   // Envelope Open Toggle Handler
   const handleEnvelopeClick = (e) => {
     if (e) {
@@ -1087,8 +1118,33 @@ export function initScene1() {
     spawnSealBurstParticles(cw, ch);
 
     if (hintPill) {
-      hintPill.style.opacity = '0';
-      hintPill.style.pointerEvents = 'none';
+      gsap.to(hintPill, { opacity: 0, duration: 0.35, pointerEvents: 'none' });
+    }
+
+    if (!prefersReducedMotion) {
+      const openTl = gsap.timeline();
+      openTl.to('#seal-assembly', {
+        scale: 0.82,
+        duration: 0.16,
+        ease: 'power1.inOut'
+      })
+      .to('#seal-assembly', {
+        scale: 0,
+        opacity: 0,
+        duration: 0.38,
+        ease: 'back.in(1.8)'
+      })
+      .to('.flap-top-hinge', {
+        rotateX: -180,
+        duration: 1.15,
+        ease: 'power2.inOut'
+      }, '-=0.1')
+      .to('.invitation-card-3d', {
+        y: '-48%',
+        scale: 1.02,
+        duration: 1.25,
+        ease: 'power2.out'
+      }, '-=0.6');
     }
 
     // Phase 2: After user admires opened envelope (~2.6s),
@@ -1184,6 +1240,10 @@ export function destroyScene1() {
   lightStreams = [];
   bgCtx = null;
   fgCtx = null;
+  if (gsapCtx) {
+    gsapCtx.revert();
+    gsapCtx = null;
+  }
   isOpen = false;
   inTitleStage = false;
   isTransitioning = false;

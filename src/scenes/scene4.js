@@ -3,19 +3,25 @@
  *
  * Cinematic Indian Wedding Celebration & Itinerary
  * Layered Architecture:
- * Layer 1: Palace Garden Sunset Background (s4_bg_desktop.png)
- * Layer 2: Decorative Floral Framing Pillars (s4_flower_pillars_alpha.png)
- * Layer 3: Grand Carved Marble Mandap with Sacred Fire & Lit Diyas (s4_mandap_01.png)
+ * Layer 1: Palace Garden Sunset Background (s4_bg_desktop.webp / png)
+ * Layer 2: Decorative Floral Framing Pillars (s4_flower_pillars_alpha.webp / png)
+ * Layer 3: Grand Carved Marble Mandap with Sacred Fire & Lit Diyas (s4_mandap_01.webp / png)
  * Layer 4: Ambient Floating Rose Petals & Golden Sparkles Canvas
- * Layer 5: Content Interface — Title, Live Countdown, 3 Event Cards & Navigation CTA
+ * Layer 5: Content Interface — Title, Live Countdown, 3 Event Cards & Save the Date Actions
  * Layer 6: Incoming Light Bloom for Scene 3 Continuity
  */
 
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { getGoogleCalendarUrl, downloadIcsFile } from '../utils/calendar.js';
 import './scene4.css';
+
+gsap.registerPlugin(ScrollTrigger);
 
 /**
  * Verified Wedding Events Data Source (Source of Truth)
- * Exactly three events: Tilak, Matkor, Shaadi
+ * Exactly three ceremonies: Tilak, Matkor, Shaadi
+ * Sourced strictly from original invitation text and verified venue details
  */
 export const WEDDING_EVENTS = [
   {
@@ -25,6 +31,7 @@ export const WEDDING_EVENTS = [
     date: '27 November 2026',
     dateISO: '2026-11-27',
     venue: 'Swarna Bhobon',
+    venueAddress: 'Swarna Bhobon',
     mapUrl: 'https://maps.app.goo.gl/oKkuRcKUejScfrzj8',
     mapLabel: 'View location of Tilak ceremony at Swarna Bhobon on Google Maps',
     icon: '✨',
@@ -36,6 +43,7 @@ export const WEDDING_EVENTS = [
     date: '28 November 2026',
     dateISO: '2026-11-28',
     venue: 'At home',
+    venueAddress: 'At home',
     mapUrl: 'https://maps.app.goo.gl/yXkeEQSZUPhdMXee7',
     mapLabel: 'View location of Matkor ceremony At home on Google Maps',
     icon: '🪔',
@@ -46,7 +54,9 @@ export const WEDDING_EVENTS = [
     name: 'Shaadi',
     date: '29 November 2026',
     dateISO: '2026-11-29',
+    time: { start: '19:00', end: '23:00', display: '7:00 PM onwards' },
     venue: 'Sethjee’s Banquet',
+    venueAddress: 'Sethjee’s Banquet, Maniktala, Kanchrapara',
     mapUrl: 'https://www.google.com/maps/place/Sethjee%E2%80%99s+Banquet/@22.9439432,88.4413581,17z/data=!3m1!4b1!4m6!3m5!1s0x39f895aa58a18ea9:0x4af002a6bd41fac!8m2!3d22.9439432!4d88.443933!16s%2Fg%2F11xcz9l0n?utm_source=chatgpt.com',
     mapLabel: 'View location of Shaadi wedding ceremony at Sethjee’s Banquet on Google Maps',
     icon: '💍',
@@ -77,8 +87,13 @@ let particleCtx = null;
 /** @type {boolean} */
 let isTransitioning = false;
 
+/** @type {gsap.Context | null} */
+let gsapCtx = null;
+
 // Stored listeners for explicit cleanup
 let resizeHandler = null;
+let activeCalDocClickHandler = null;
+let activeCalDocKeyHandler = null;
 
 function addSafeTimer(fn, delay) {
   const id = window.setTimeout(fn, delay);
@@ -89,7 +104,7 @@ function addSafeTimer(fn, delay) {
 function clearAllTimers() {
   activeTimers.forEach((item) => {
     if (typeof item === 'function') {
-      try { item(); } catch (_) {}
+      try { item(); } catch {}
     } else {
       clearTimeout(item);
     }
@@ -125,7 +140,7 @@ function createParticle(canvas) {
 
 function initParticles(canvas) {
   ambientParticles = [];
-  const count = window.innerWidth < 640 ? 30 : 55;
+  const count = window.innerWidth < 640 ? 25 : 45;
   for (let i = 0; i < count; i++) {
     ambientParticles.push(createParticle(canvas));
   }
@@ -168,7 +183,7 @@ function drawParticles(ctx, canvas) {
       ctx.arc(0, 0, p.size, 0, Math.PI * 2);
       ctx.fill();
 
-      // Soft glow aura (Zero-CPU-blur hardware-accelerated replacement)
+      // Soft glow aura
       ctx.fillStyle = `${p.color}${alpha * 0.25})`;
       ctx.beginPath();
       ctx.arc(0, 0, p.size * 2, 0, Math.PI * 2);
@@ -252,33 +267,61 @@ export function createScene4() {
 
       <!-- Layer 1: Palace Garden Sunset Background -->
       <div class="scene-4-bg-layer" aria-hidden="true">
-        <img
-          src="/assets/scene-4/s4_bg_desktop.png"
-          alt=""
-          class="scene-4-bg-img"
-          draggable="false"
-        />
+        <picture class="scene-4-bg-picture">
+          <source srcset="/assets/scene-4/s4_bg_desktop.webp" type="image/webp" />
+          <img
+            src="/assets/scene-4/s4_bg_desktop.png"
+            width="1024"
+            height="576"
+            alt=""
+            class="scene-4-bg-img"
+            draggable="false"
+          />
+        </picture>
         <div class="scene-4-bg-vignette"></div>
       </div>
 
       <!-- Layer 2: Decorative Floral Framing Pillars (Outer Framing) -->
       <div class="scene-4-pillars-layer" aria-hidden="true">
         <div class="scene-4-pillar scene-4-pillar--left">
-          <img src="/assets/scene-4/s4_flower_pillars_alpha.png" alt="" draggable="false" />
+          <picture>
+            <source srcset="/assets/scene-4/s4_flower_pillars_alpha.webp" type="image/webp" />
+            <img
+              src="/assets/scene-4/s4_flower_pillars_alpha.png"
+              width="540"
+              height="960"
+              alt=""
+              draggable="false"
+            />
+          </picture>
         </div>
         <div class="scene-4-pillar scene-4-pillar--right">
-          <img src="/assets/scene-4/s4_flower_pillars_alpha.png" alt="" draggable="false" />
+          <picture>
+            <source srcset="/assets/scene-4/s4_flower_pillars_alpha.webp" type="image/webp" />
+            <img
+              src="/assets/scene-4/s4_flower_pillars_alpha.png"
+              width="540"
+              height="960"
+              alt=""
+              draggable="false"
+            />
+          </picture>
         </div>
       </div>
 
       <!-- Layer 3: Grand Carved Marble Mandap Centerpiece -->
       <div class="scene-4-mandap-layer" aria-hidden="true">
-        <img
-          src="/assets/scene-4/s4_mandap_01.png"
-          alt=""
-          class="scene-4-mandap-img"
-          draggable="false"
-        />
+        <picture class="scene-4-mandap-picture">
+          <source srcset="/assets/scene-4/s4_mandap_01.webp" type="image/webp" />
+          <img
+            src="/assets/scene-4/s4_mandap_01.png"
+            width="960"
+            height="809"
+            alt=""
+            class="scene-4-mandap-img"
+            draggable="false"
+          />
+        </picture>
         <div class="scene-4-mandap-glow"></div>
       </div>
 
@@ -340,7 +383,7 @@ export function createScene4() {
             </p>
           </section>
 
-          <!-- C. The Three Wedding Event Cards -->
+          <!-- C. The Three Wedding Event Cards with Save the Date -->
           <main class="scene-4-events-grid" role="list" aria-label="Schedule of Wedding Events">
             ${WEDDING_EVENTS.map(
     (event, idx) => `
@@ -371,6 +414,16 @@ export function createScene4() {
                     <time datetime="${event.dateISO}" class="scene-4-event-date">${event.date}</time>
                   </div>
 
+                  ${event.time ? `
+                    <div class="scene-4-event-detail-row scene-4-event-time-row">
+                      <svg class="scene-4-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                      <span class="scene-4-event-time">${event.time.display}</span>
+                    </div>
+                  ` : ''}
+
                   <div class="scene-4-event-detail-row">
                     <svg class="scene-4-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -379,21 +432,86 @@ export function createScene4() {
                     <span class="scene-4-event-venue">${event.venue}</span>
                   </div>
 
-                  <div class="scene-4-card-action">
+                  <!-- Actions: View Location & Save the Date -->
+                  <div class="scene-4-card-actions">
                     <a
                       href="${event.mapUrl}"
                       data-url="${event.mapUrl}"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="scene-4-map-btn"
+                      class="scene-4-action-btn scene-4-map-btn"
                       aria-label="${event.mapLabel}"
                     >
-                      <svg class="scene-4-map-pin-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <svg class="scene-4-btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                       </svg>
-                      <span>View Location</span>
-                      <span class="scene-4-map-arrow" aria-hidden="true">↗</span>
+                      <span>Location</span>
+                      <span class="scene-4-btn-arrow" aria-hidden="true">↗</span>
                     </a>
+
+                    <!-- Save the Date Dropdown -->
+                    <div class="scene-4-cal-dropdown">
+                      <button
+                        type="button"
+                        id="save-date-btn-${event.id}"
+                        class="scene-4-action-btn scene-4-cal-btn"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        aria-controls="cal-menu-${event.id}"
+                        aria-label="Save ${event.name} date to your calendar"
+                        data-event-id="${event.id}"
+                      >
+                        <svg class="scene-4-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                          <path d="M12 14v4"></path>
+                          <path d="M10 16h4"></path>
+                        </svg>
+                        <span>Save Date</span>
+                        <span class="scene-4-cal-caret" aria-hidden="true">▾</span>
+                      </button>
+
+                      <div
+                        id="cal-menu-${event.id}"
+                        class="scene-4-cal-menu"
+                        role="menu"
+                        aria-label="Calendar options for ${event.name}"
+                      >
+                        <a
+                          href="${getGoogleCalendarUrl(event)}"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="scene-4-cal-item scene-4-cal-item-link"
+                          role="menuitem"
+                          aria-label="Add ${event.name} to Google Calendar (opens in new tab)"
+                        >
+                          <span class="scene-4-cal-item-icon" aria-hidden="true">📅</span>
+                          <span class="scene-4-cal-item-text">
+                            <strong>Google Calendar</strong>
+                            <small>Open in new tab</small>
+                          </span>
+                          <span class="scene-4-cal-item-arrow" aria-hidden="true">↗</span>
+                        </a>
+
+                        <button
+                          type="button"
+                          class="scene-4-cal-item scene-4-cal-item-btn"
+                          role="menuitem"
+                          data-action="download-ics"
+                          data-event-id="${event.id}"
+                          aria-label="Download calendar file (.ics) for Apple Calendar, Outlook, and other apps"
+                        >
+                          <span class="scene-4-cal-item-icon" aria-hidden="true">📥</span>
+                          <span class="scene-4-cal-item-text">
+                            <strong>Download .ICS</strong>
+                            <small>Apple, Outlook, etc.</small>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+
                   </div>
 
                   <!-- Decorative Antique-Gold Corner Accents -->
@@ -445,34 +563,48 @@ export function initScene4() {
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (prefersReducedMotion) {
-    scene4.classList.add('phase-a', 'phase-b', 'phase-c', 'phase-d', 'phase-settled');
-  } else {
-    // Phase A: Background reveal (0-200ms)
-    addSafeTimer(() => {
-      scene4.classList.add('phase-a');
-    }, 60);
-
-    // Phase B: Architectural mandap & pillars reveal (300ms)
-    addSafeTimer(() => {
-      scene4.classList.add('phase-b');
-    }, 300);
-
-    // Phase C: Coordinated event cards sequence (600ms)
-    addSafeTimer(() => {
-      scene4.classList.add('phase-c');
-    }, 600);
-
-    // Phase D: Countdown & ambient details (850ms)
-    addSafeTimer(() => {
-      scene4.classList.add('phase-d');
-    }, 850);
-
-    // Phase E: Settled stable scene (1300ms)
-    addSafeTimer(() => {
-      scene4.classList.add('phase-settled');
-    }, 1300);
+  // ─── GSAP Scoped Entrance Timeline & Parallax ─────────────────────────────
+  if (gsapCtx) {
+    gsapCtx.revert();
+    gsapCtx = null;
   }
+
+  gsapCtx = gsap.context(() => {
+    if (prefersReducedMotion) {
+      gsap.set(
+        ['.scene-4-bg-img', '.scene-4-pillar', '.scene-4-mandap-img', '.scene-4-anim-item', '.scene-4-event-card'],
+        { opacity: 1, y: 0, x: 0, scale: 1 }
+      );
+      return;
+    }
+
+    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+    tl.fromTo('.scene-4-bg-img', { scale: 1.04, opacity: 0.6 }, { scale: 1, opacity: 1, duration: 1.1 }, 0)
+      .fromTo('.scene-4-pillar--left', { x: -25, opacity: 0 }, { x: 0, opacity: 0.78, duration: 0.9 }, 0.15)
+      .fromTo('.scene-4-pillar--right', { x: 25, opacity: 0 }, { x: 0, opacity: 0.78, duration: 0.9 }, 0.15)
+      .fromTo('.scene-4-mandap-img', { y: 35, opacity: 0, scale: 0.96 }, { y: 0, opacity: 0.88, scale: 1, duration: 1 }, 0.2)
+      .fromTo('.scene-4-header', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.75 }, 0.35)
+      .fromTo('.scene-4-countdown-card', { y: 22, opacity: 0, scale: 0.97 }, { y: 0, opacity: 1, scale: 1, duration: 0.7 }, 0.48)
+      .fromTo('.scene-4-event-card', { y: 28, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.14, duration: 0.75 }, 0.6)
+      .fromTo('.scene-4-cta-wrap', { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55 }, 0.9);
+
+    // Subtle scroll parallax for the background architectural layers
+    const scrollContainer = scene4.querySelector('.scene-4-scroll-container');
+    if (scrollContainer) {
+      ScrollTrigger.create({
+        trigger: '.scene-4-content-wrap',
+        scroller: scrollContainer,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.5,
+        onUpdate: (self) => {
+          gsap.to('.scene-4-mandap-img', { y: self.progress * 38, overwrite: 'auto', duration: 0.15 });
+          gsap.to('.scene-4-pillar', { y: self.progress * 20, overwrite: 'auto', duration: 0.15 });
+        },
+      });
+    }
+  }, scene4);
 
   // Start live wedding countdown
   startCountdown();
@@ -512,7 +644,62 @@ export function initScene4() {
     window.addEventListener('resize', resizeHandler, { passive: true });
   }
 
-  // ─── Dedicated Google Maps Link Click & Keydown Handlers ─────────────────
+  // ─── Save the Date Dropdown and Download Interactivity ─────────────────────
+  const closeAllCalMenus = () => {
+    const openMenus = scene4.querySelectorAll('.scene-4-cal-dropdown.open');
+    openMenus.forEach((drop) => {
+      drop.classList.remove('open');
+      const btn = drop.querySelector('.scene-4-cal-btn');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    });
+  };
+
+  const calButtons = scene4.querySelectorAll('.scene-4-cal-btn');
+  calButtons.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dropdown = btn.closest('.scene-4-cal-dropdown');
+      if (!dropdown) return;
+
+      const isAlreadyOpen = dropdown.classList.contains('open');
+      closeAllCalMenus();
+
+      if (!isAlreadyOpen) {
+        dropdown.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  // Handle .ICS file downloads
+  const icsDownloadButtons = scene4.querySelectorAll('[data-action="download-ics"]');
+  icsDownloadButtons.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const eventId = btn.getAttribute('data-event-id');
+      const eventData = WEDDING_EVENTS.find((ev) => ev.id === eventId);
+      if (eventData) {
+        downloadIcsFile(eventData);
+      }
+      closeAllCalMenus();
+    });
+  });
+
+  // Close menus on outside click & Escape key
+  activeCalDocClickHandler = (e) => {
+    if (!e.target.closest('.scene-4-cal-dropdown')) {
+      closeAllCalMenus();
+    }
+  };
+  activeCalDocKeyHandler = (e) => {
+    if (e.key === 'Escape') {
+      closeAllCalMenus();
+    }
+  };
+  document.addEventListener('click', activeCalDocClickHandler);
+  document.addEventListener('keydown', activeCalDocKeyHandler);
+
+  // ─── Google Maps Link Click & Keydown Handlers ─────────────────────────────
   const mapButtons = scene4.querySelectorAll('.scene-4-map-btn');
   mapButtons.forEach((btn) => {
     const handleOpenMap = (e) => {
@@ -523,7 +710,6 @@ export function initScene4() {
       }
       e.preventDefault();
     };
-
     btn.addEventListener('click', handleOpenMap);
   });
 
@@ -631,6 +817,20 @@ export function destroyScene4() {
   cancelAnimationFrame(particleAnimFrame);
   ambientParticles = [];
   isTransitioning = false;
+
+  if (gsapCtx) {
+    gsapCtx.revert();
+    gsapCtx = null;
+  }
+
+  if (activeCalDocClickHandler) {
+    document.removeEventListener('click', activeCalDocClickHandler);
+    activeCalDocClickHandler = null;
+  }
+  if (activeCalDocKeyHandler) {
+    document.removeEventListener('keydown', activeCalDocKeyHandler);
+    activeCalDocKeyHandler = null;
+  }
 
   if (resizeHandler) {
     window.removeEventListener('resize', resizeHandler);

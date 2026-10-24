@@ -3,19 +3,23 @@
  *
  * Cinematic Indian Wedding Invitation Reveal
  * Six-Layer Visual Architecture:
- * Layer 1: Sunset Palace Courtyard & Lake Background (s3_palace_sunset.jpg)
- * Layer 2: Ornate Carved Wedding Arch with Brass Lanterns & Rose Garlands (s3_ornate_arch.png)
- * Layer 3: Royal Velvet Tied-Back Curtains with Tassels (s3_curtain_left / right.png)
- * Layer 4: Symmetrical Golden Peacocks on Marble Pedestals with Lit Deepams (s3_peacocks.png)
+ * Layer 1: Sunset Palace Courtyard & Lake Background (s3_palace_sunset.webp / jpg)
+ * Layer 2: Ornate Carved Wedding Arch with Brass Lanterns & Rose Garlands (s3_ornate_arch.webp / png)
+ * Layer 3: Royal Velvet Tied-Back Curtains with Tassels
+ * Layer 4: Symmetrical Golden Peacocks on Marble Pedestals with Lit Deepams (s3_peacocks.webp / png)
  * Layer 5: Ambient Golden Sparkles & Floating Rose Petals Canvas
  * Layer 6: The Grand Invitation Scroll Card (Real HTML & CSS typography)
  * Layer 7: Incoming Golden Light Bloom for Scene 2 Continuity
  */
 
 import './scene3.css';
+import { gsap } from 'gsap';
 
 /** @type {number[]} */
 let activeTimers = [];
+
+/** @type {gsap.Context | null} */
+let gsapCtx = null;
 
 /** @type {number} */
 let particleAnimFrame = 0;
@@ -108,7 +112,7 @@ function drawParticles(ctx, canvas) {
       ctx.arc(0, 0, p.size, 0, Math.PI * 2);
       ctx.fill();
 
-      // Soft glow aura (Zero-CPU-blur hardware-accelerated replacement)
+      // Soft glow aura
       ctx.fillStyle = `${p.color}${alpha * 0.25})`;
       ctx.beginPath();
       ctx.arc(0, 0, p.size * 2, 0, Math.PI * 2);
@@ -142,13 +146,19 @@ export function createScene3() {
            LAYER 1: Sunset Palace Courtyard & Lake
            ============================================== -->
       <div class="scene-3-bg-wrap" aria-hidden="true">
-        <img
-          src="/assets/scene-3/s3_palace_sunset.jpg"
-          alt=""
-          class="scene-3-bg-img"
-          loading="eager"
-          draggable="false"
-        />
+        <picture>
+          <source srcset="/assets/scene-3/s3_palace_sunset.webp" type="image/webp" />
+          <img
+            src="/assets/scene-3/s3_palace_sunset.jpg"
+            alt=""
+            class="scene-3-bg-img"
+            loading="eager"
+            decoding="async"
+            width="1024"
+            height="576"
+            draggable="false"
+          />
+        </picture>
       </div>
 
       <!-- Atmospheric warm sunset vignette -->
@@ -158,27 +168,38 @@ export function createScene3() {
            LAYER 2: Ornate Carved Wedding Arch
            ============================================== -->
       <div class="scene-3-arch-wrap" aria-hidden="true">
-        <img
-          src="/assets/scene-3/s3_ornate_arch.png"
-          alt=""
-          class="scene-3-arch-img"
-          loading="eager"
-          draggable="false"
-        />
+        <picture>
+          <source srcset="/assets/scene-3/s3_ornate_arch.webp" type="image/webp" />
+          <img
+            src="/assets/scene-3/s3_ornate_arch.png"
+            alt=""
+            class="scene-3-arch-img"
+            loading="eager"
+            decoding="async"
+            width="1024"
+            height="576"
+            draggable="false"
+          />
+        </picture>
       </div>
-
 
       <!-- ==============================================
            LAYER 4: Royal Peacocks on Marble Pedestals
            ============================================== -->
       <div class="scene-3-peacocks-wrap" aria-hidden="true">
-        <img
-          src="/assets/scene-3/s3_peacocks.png"
-          alt=""
-          class="scene-3-peacocks-img"
-          loading="eager"
-          draggable="false"
-        />
+        <picture>
+          <source srcset="/assets/scene-3/s3_peacocks.webp" type="image/webp" />
+          <img
+            src="/assets/scene-3/s3_peacocks.png"
+            alt=""
+            class="scene-3-peacocks-img"
+            loading="eager"
+            decoding="async"
+            width="1024"
+            height="576"
+            draggable="false"
+          />
+        </picture>
       </div>
 
       <!-- ==============================================
@@ -208,7 +229,7 @@ export function createScene3() {
             </svg>
 
             <!-- A. Devotional Heading -->
-            <header class="scene-3-devotional scene-3-fade-item scene-3-fade-1">
+            <header class="scene-3-devotional scene-3-fade-item">
               <img
                 src="/assets/scene-3/s3_lotus_motif_gold.png"
                 alt=""
@@ -219,41 +240,41 @@ export function createScene3() {
               <p class="scene-3-shloka">वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ। निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा॥</p>
             </header>
 
-            <div class="scene-3-divider scene-3-fade-item scene-3-fade-2" aria-hidden="true">
+            <div class="scene-3-divider scene-3-fade-item" aria-hidden="true">
               <span class="scene-3-divider-line"></span>
               <span class="scene-3-divider-icon">✦ 🪷 ✦</span>
               <span class="scene-3-divider-line"></span>
             </div>
 
             <!-- B. Invitation Heading -->
-            <p class="scene-3-heading scene-3-fade-item scene-3-fade-2">YOU ARE CORDIALLY INVITED</p>
+            <p class="scene-3-heading scene-3-fade-item">YOU ARE CORDIALLY INVITED</p>
 
             <!-- C. Couple's Names — Dominant Focal Point -->
-            <div class="scene-3-couple scene-3-fade-item scene-3-fade-3">
+            <div class="scene-3-couple scene-3-fade-item">
               <h1 class="scene-3-name scene-3-bride">Sneha Sinha</h1>
               <span class="scene-3-ampersand" aria-hidden="true">&amp;</span>
               <h1 class="scene-3-name scene-3-groom">Dipak Prasad</h1>
             </div>
 
             <!-- D. Invitation Message -->
-            <p class="scene-3-message scene-3-fade-item scene-3-fade-4">
+            <p class="scene-3-message scene-3-fade-item">
               “With the blessings of our families, we invite you to celebrate the wedding of Sneha Sinha and Dipak Prasad and to join us in this beautiful occasion of love and togetherness.”
             </p>
 
             <!-- E. Wedding Date Badge -->
-            <div class="scene-3-date-badge scene-3-fade-item scene-3-fade-5">
+            <div class="scene-3-date-badge scene-3-fade-item">
               <span class="scene-3-date-icon" aria-hidden="true">📅</span>
               <span class="scene-3-date-text">Sunday, 29 November 2026</span>
             </div>
 
             <!-- F. Venue Details -->
-            <div class="scene-3-venue scene-3-fade-item scene-3-fade-5">
+            <div class="scene-3-venue scene-3-fade-item">
               <h3 class="scene-3-venue-name">Sethjees Banquet</h3>
               <p class="scene-3-venue-loc">Maniktala, Kanchrapara</p>
             </div>
 
             <!-- G. Family Details (Balanced Two-Column Layout) -->
-            <div class="scene-3-families scene-3-fade-item scene-3-fade-6">
+            <div class="scene-3-families scene-3-fade-item">
               <div class="scene-3-family-col">
                 <span class="scene-3-family-label">Bride’s Parents</span>
                 <span class="scene-3-parent-name">Shri Prabhat Kumar Sinha</span>
@@ -267,7 +288,7 @@ export function createScene3() {
             </div>
 
             <!-- Action CTA & Scene 4 Handoff -->
-            <div class="scene-3-cta-wrap scene-3-fade-item scene-3-fade-7">
+            <div class="scene-3-cta-wrap scene-3-fade-item">
               <button
                 id="scene-3-next-btn"
                 class="scene-3-cta-btn"
@@ -290,10 +311,32 @@ export function createScene3() {
       <div class="scene-3-curtains" aria-hidden="true">
         <div class="scene-3-curtain-crevice"></div>
         <div class="scene-3-curtain-panel scene-3-curtain-panel--left">
-          <img src="/assets/scene-3/s3_curtain_closed_left.png" alt="" draggable="false" />
+          <picture>
+            <source srcset="/assets/scene-3/s3_curtain_closed_left.webp" type="image/webp" />
+            <img
+              src="/assets/scene-3/s3_curtain_closed_left.png"
+              alt=""
+              loading="eager"
+              decoding="async"
+              width="800"
+              height="1160"
+              draggable="false"
+            />
+          </picture>
         </div>
         <div class="scene-3-curtain-panel scene-3-curtain-panel--right">
-          <img src="/assets/scene-3/s3_curtain_closed_right.png" alt="" draggable="false" />
+          <picture>
+            <source srcset="/assets/scene-3/s3_curtain_closed_right.webp" type="image/webp" />
+            <img
+              src="/assets/scene-3/s3_curtain_closed_right.png"
+              alt=""
+              loading="eager"
+              decoding="async"
+              width="800"
+              height="1160"
+              draggable="false"
+            />
+          </picture>
         </div>
       </div>
 
@@ -317,19 +360,67 @@ export function initScene3() {
   scene3.classList.add('active');
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReducedMotion) {
-    scene3.classList.add('curtains-open', 'card-revealed');
-  } else {
-    // Stage B: Curtain-opening animation starts visibly at 300ms
-    addSafeTimer(() => {
-      scene3.classList.add('curtains-open');
-    }, 300);
 
-    // Stage C: Card reveals progressively behind opening curtains at 650ms
-    addSafeTimer(() => {
-      scene3.classList.add('card-revealed');
-    }, 650);
+  // Scoped GSAP Orchestration for Scene 3
+  if (gsapCtx) {
+    gsapCtx.revert();
+    gsapCtx = null;
   }
+
+  gsapCtx = gsap.context(() => {
+    if (prefersReducedMotion) {
+      scene3.classList.add('curtains-open', 'card-revealed');
+      gsap.set('.scene-3-curtains', { display: 'none' });
+      gsap.set('.scene-3-card-container', { opacity: 1, y: 0, scale: 1 });
+      gsap.set('.scene-3-peacocks-wrap', { opacity: 1, scale: 1, y: 0 });
+      gsap.set('.scene-3-fade-item', { opacity: 1, y: 0 });
+      return;
+    }
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        scene3.classList.add('curtains-open', 'card-revealed');
+      },
+    });
+
+    // 1. Instantly hide crevice as curtains start parting
+    tl.to('.scene-3-curtain-crevice', {
+      opacity: 0,
+      duration: 0.35,
+      ease: 'power2.out',
+    }, 0.1)
+    // 2. Part the closed curtains completely off-screen (-105% / +105%)
+    .to('.scene-3-curtain-panel--left', {
+      xPercent: -105,
+      duration: 1.4,
+      ease: 'power2.inOut',
+    }, 0.15)
+    .to('.scene-3-curtain-panel--right', {
+      xPercent: 105,
+      duration: 1.4,
+      ease: 'power2.inOut',
+    }, 0.15)
+    // Hide curtain container when done so it never blocks or overlaps
+    .set('.scene-3-curtains', { display: 'none' })
+    // 3. Peacocks reveal smoothly
+    .fromTo('.scene-3-peacocks-wrap',
+      { opacity: 0, scale: 0.94, y: 15 },
+      { opacity: 1, scale: 1, y: 0, duration: 1, ease: 'power2.out' },
+      0.4
+    )
+    // 4. Grand Invitation Scroll Card enters with restrained elegance
+    .fromTo('.scene-3-card-container',
+      { opacity: 0, y: 28, scale: 0.94 },
+      { opacity: 1, y: 0, scale: 1, duration: 1, ease: 'power2.out' },
+      0.55
+    )
+    // 5. Staggered reveal of internal card typography & elements
+    .fromTo('.scene-3-fade-item',
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out' },
+      0.85
+    );
+  }, scene3);
 
   // Dissolve incoming golden bloom smoothly
   const bloom = scene3.querySelector('.scene-3-incoming-bloom');
@@ -353,7 +444,6 @@ export function initScene3() {
       particleAnimFrame = requestAnimationFrame(animationLoop);
     };
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!prefersReducedMotion) {
       animationLoop();
     }
@@ -365,7 +455,7 @@ export function initScene3() {
       }
     };
     window.addEventListener('resize', handleResize, { passive: true });
-    activeTimers.push(handleResize); // tracked for cleanup if needed
+    activeTimers.push(handleResize);
   }
 
   // Handle Handoff to Scene 4
@@ -478,6 +568,11 @@ export function destroyScene3() {
   if (window._scene3TouchEndHandler) {
     window.removeEventListener('touchend', window._scene3TouchEndHandler);
     window._scene3TouchEndHandler = null;
+  }
+
+  if (gsapCtx) {
+    gsapCtx.revert();
+    gsapCtx = null;
   }
 
   const scene3 = document.getElementById('scene-3');

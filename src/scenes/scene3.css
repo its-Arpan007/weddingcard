@@ -101,7 +101,6 @@
   filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.6));
 }
 
-
 /* ─── Layer 4: Peacock Flanking Decorations ──────────────────────────────── */
 
 .scene-3-peacocks-wrap {
@@ -111,14 +110,7 @@
   height: 100%;
   z-index: 4;
   pointer-events: none;
-  opacity: 0;
-  transform: translateY(15px);
-  transition: opacity 1.5s ease 0.6s, transform 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.6s;
-}
-
-.scene-3.active .scene-3-peacocks-wrap {
   opacity: 1;
-  transform: translateY(0);
 }
 
 .scene-3-peacocks-img {
@@ -146,7 +138,7 @@
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 620px;
+  max-width: 610px;
   max-height: 92vh;
   max-height: 92dvh;
   margin: auto;
@@ -155,17 +147,8 @@
   align-items: center;
   justify-content: center;
   padding: 8px 16px;
-  pointer-events: none;
-  opacity: 0;
-  transform: scale(0.92) translateY(16px);
-  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.scene-3.card-revealed .scene-3-card-container {
-  opacity: 1;
-  transform: scale(1) translateY(0);
   pointer-events: auto;
+  opacity: 1;
 }
 
 /* The Grand Parchment Scroll Card */
@@ -233,25 +216,9 @@
 
 /* ─── Typography & Content Hierarchy ─────────────────────────────────────── */
 
-/* Stagger reveal animation classes */
 .scene-3-fade-item {
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
 }
-
-.scene-3.card-revealed .scene-3-fade-item {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.scene-3.card-revealed .scene-3-fade-1 { transition-delay: 0.15s; }
-.scene-3.card-revealed .scene-3-fade-2 { transition-delay: 0.3s; }
-.scene-3.card-revealed .scene-3-fade-3 { transition-delay: 0.45s; }
-.scene-3.card-revealed .scene-3-fade-4 { transition-delay: 0.6s; }
-.scene-3.card-revealed .scene-3-fade-5 { transition-delay: 0.75s; }
-.scene-3.card-revealed .scene-3-fade-6 { transition-delay: 0.9s; }
-.scene-3.card-revealed .scene-3-fade-7 { transition-delay: 1.05s; }
 
 /* A. Devotional Header */
 .scene-3-devotional {
@@ -491,6 +458,7 @@
   border: 1.5px solid #d4af37;
   border-radius: 26px;
   padding: 9px 24px;
+  min-height: 44px;
   font-family: 'Cinzel', serif;
   font-size: 0.84rem;
   font-weight: 600;
@@ -551,7 +519,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 51.5%;
+  width: 52%;
   height: 100%;
   overflow: hidden;
   will-change: transform;
@@ -561,34 +529,27 @@
 .scene-3-curtain-panel--left {
   left: 0;
   transform: translateX(0);
-  transition: transform 1.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .scene-3-curtain-panel--right {
   right: 0;
   transform: translateX(0);
-  transition: transform 1.35s cubic-bezier(0.22, 1, 0.36, 1) 0.04s;
 }
 
-/* Parting Movement: Curtains move apart toward edges and remain open framing the card */
+/* Parting Movement fallback for reduced motion or fallback */
 .scene-3.curtains-open .scene-3-curtain-panel--left {
-  transform: translateX(-76%);
+  transform: translateX(-105%);
 }
 
 .scene-3.curtains-open .scene-3-curtain-panel--right {
-  transform: translateX(76%);
+  transform: translateX(105%);
 }
 
-@media (max-width: 640px) {
-  .scene-3.curtains-open .scene-3-curtain-panel--left {
-    transform: translateX(-84%);
-  }
-
-  .scene-3.curtains-open .scene-3-curtain-panel--right {
-    transform: translateX(84%);
-  }
+.scene-3.curtains-open .scene-3-curtains {
+  display: none !important;
 }
 
+.scene-3-curtain-panel picture,
 .scene-3-curtain-panel img {
   width: 100%;
   height: 100%;
@@ -627,7 +588,7 @@
   pointer-events: none;
   opacity: 0.95;
   z-index: 16;
-  transition: opacity 0.5s ease-out;
+  transition: opacity 0.35s ease-out;
 }
 
 .scene-3.curtains-open .scene-3-curtain-crevice {
@@ -687,12 +648,6 @@
   }
   .scene-3-name {
     font-size: 1.95rem;
-  }
-  .scene-3-curtain--left {
-    transform: translateX(-8%);
-  }
-  .scene-3-curtain--right {
-    transform: translateX(8%);
   }
 }
 
@@ -800,119 +755,28 @@
   .scene-3-cta-btn {
     padding: 10px 22px;
     font-size: 0.76rem;
-    letter-spacing: 0.07em;
     min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* Reposition/fade flanking decorations on mobile so card is 100% readable */
-  .scene-3-peacocks-wrap {
-    opacity: 0.4;
-    transform: scale(0.85) translateY(8%);
-  }
-
-  .scene-3-curtain--left {
-    transform: translateX(-15%);
-    opacity: 0.75;
-  }
-
-  .scene-3-curtain--right {
-    transform: translateX(15%);
-    opacity: 0.75;
   }
 }
 
-/* Extra Compact Mobile (<= 480px) */
-@media (max-width: 480px) {
-  .scene-3-card-container {
-    max-height: 92dvh;
-    padding: max(4px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
-  }
-
-  .scene-3-name {
-    font-size: clamp(1.45rem, 5.8vw, 1.75rem);
-  }
-
-  .scene-3-card {
-    padding: 14px 12px 12px;
-  }
-
-  .scene-3-card-inner {
-    padding: 10px 10px 8px;
-  }
-}
-
-/* Compact Mobile Height (≤ 600px viewport height) */
-@media (max-height: 600px) {
-  .scene-3-card-container {
-    max-height: 96vh;
-  }
-  .scene-3-card {
-    padding: 12px 10px 10px;
-  }
-  .scene-3-card-inner {
-    padding: 10px 8px 8px;
-  }
-  .scene-3-name {
-    font-size: 1.45rem;
-  }
-  .scene-3-devotional {
-    margin-bottom: 3px;
-  }
-  .scene-3-shloka {
-    display: none; /* Hide secondary shloka to save vertical room on short phones */
-  }
-  .scene-3-divider {
-    margin: 3px auto;
-  }
-  .scene-3-heading {
-    margin: 2px 0 4px;
-  }
-  .scene-3-couple {
-    margin: 2px 0 6px;
-  }
-  .scene-3-message {
-    font-size: 0.84rem;
-    margin-bottom: 6px;
-  }
-  .scene-3-date-badge {
-    margin-bottom: 6px;
-    padding: 3px 12px;
-  }
-  .scene-3-venue {
-    margin-bottom: 6px;
-  }
-  .scene-3-families {
-    margin-bottom: 8px;
-    padding: 6px 8px;
-  }
-}
-
-/* ─── Accessibility: Prefers Reduced Motion ──────────────────────────────── */
+/* ─── Reduced Motion Accessibility ────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
+  .scene-3-bg-img,
   .scene-3-arch-wrap,
-  .scene-3-curtain-panel,
   .scene-3-peacocks-wrap,
   .scene-3-card-container,
+  .scene-3-card,
   .scene-3-fade-item,
+  .scene-3-curtain-panel,
   .scene-3-incoming-bloom {
     transition: none !important;
     animation: none !important;
-    opacity: 1 !important;
     transform: none !important;
+    opacity: 1 !important;
   }
-  .scene-3-incoming-bloom,
-  .scene-3-curtain-crevice {
+
+  .scene-3-curtains {
     display: none !important;
-  }
-  .scene-3-curtain-panel--left {
-    transform: translateX(-76%) !important;
-  }
-  .scene-3-curtain-panel--right {
-    transform: translateX(76%) !important;
   }
 }

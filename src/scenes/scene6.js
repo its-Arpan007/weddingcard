@@ -9,6 +9,7 @@
  * - Phase E: Grand Finale & Closing Message (Night fireworks, royal closing card, stable ending)
  */
 
+import { gsap } from 'gsap';
 import './scene6.css';
 
 /**
@@ -68,6 +69,9 @@ let currentStageIndex = 0;
 /** @type {number | null} */
 let stageAutoTimer = null;
 
+/** @type {gsap.Context | null} */
+let gsapCtx = null;
+
 // Stored handlers for clean teardown
 let resizeHandler = null;
 let keydownHandler = null;
@@ -81,7 +85,7 @@ function addSafeTimer(fn, delay) {
 function clearAllTimers() {
   activeTimers.forEach((item) => {
     if (typeof item === 'function') {
-      try { item(); } catch (_) {}
+      try { item(); } catch {}
     } else {
       clearTimeout(item);
     }
@@ -118,7 +122,7 @@ function createParticle(canvas) {
 
 function initParticles(canvas) {
   ambientParticles = [];
-  const count = window.innerWidth < 640 ? 35 : 65;
+  const count = window.innerWidth < 640 ? 30 : 55;
   for (let i = 0; i < count; i++) {
     ambientParticles.push(createParticle(canvas));
   }
@@ -161,7 +165,7 @@ function drawParticles(ctx, canvas) {
       ctx.arc(0, 0, p.size, 0, Math.PI * 2);
       ctx.fill();
 
-      // Soft glow aura (Zero-CPU-blur hardware-accelerated replacement)
+      // Soft glow aura
       ctx.fillStyle = `${p.color}${alpha * 0.25})`;
       ctx.beginPath();
       ctx.arc(0, 0, p.size * 2, 0, Math.PI * 2);
@@ -191,8 +195,9 @@ function setStage(stageIndex, userTriggered = false) {
 
   currentStageIndex = stageIndex;
   const currentStage = FINALE_STAGES[stageIndex];
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Update scene class for CSS transitions
+  // Update scene class for CSS
   scene6.setAttribute('data-stage', currentStage.id);
 
   // Update milestone navigation pills
@@ -207,7 +212,7 @@ function setStage(stageIndex, userTriggered = false) {
     }
   });
 
-  // Update stage banner text
+  // Update stage banner text with GSAP
   const tagEl = scene6.querySelector('.scene-6-stage-tag');
   const titleEl = scene6.querySelector('.scene-6-stage-title');
   const subtitleEl = scene6.querySelector('.scene-6-stage-subtitle');
@@ -216,6 +221,10 @@ function setStage(stageIndex, userTriggered = false) {
   if (titleEl) titleEl.textContent = currentStage.title;
   if (subtitleEl) subtitleEl.textContent = currentStage.subtitle;
 
+  if (!prefersReducedMotion && tagEl && titleEl && subtitleEl) {
+    gsap.fromTo([tagEl, titleEl, subtitleEl], { opacity: 0.4, y: 5 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.06 });
+  }
+
   // Toggle stage elements visibility
   const stageViews = scene6.querySelectorAll('.scene-6-stage-view');
   stageViews.forEach((view) => {
@@ -223,6 +232,14 @@ function setStage(stageIndex, userTriggered = false) {
     if (viewStage === currentStage.id) {
       view.classList.add('active');
       view.setAttribute('aria-hidden', 'false');
+
+      if (!prefersReducedMotion) {
+        if (currentStage.id === 'baraat') {
+          gsap.fromTo('.scene-6-procession-img', { x: -35, opacity: 0 }, { x: 0, opacity: 1, duration: 1.1, ease: 'power2.out' });
+        } else if (currentStage.id === 'finale') {
+          gsap.fromTo('.scene-6-closing-card', { y: 25, scale: 0.96, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.85, ease: 'power2.out' });
+        }
+      }
     } else {
       view.classList.remove('active');
       view.setAttribute('aria-hidden', 'true');
@@ -235,7 +252,6 @@ function setStage(stageIndex, userTriggered = false) {
     stageAutoTimer = null;
   }
 
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!prefersReducedMotion && currentStage.duration > 0 && !userTriggered) {
     stageAutoTimer = setTimeout(() => {
       setStage(stageIndex + 1);
@@ -255,22 +271,32 @@ export function createScene6() {
       <!-- View 1: Grand Baraat Arrival (Palace BG + Transparent Procession Layer) -->
       <div class="scene-6-stage-view scene-6-view-baraat active" data-view-stage="baraat" aria-hidden="false">
         <div class="scene-6-bg-wrap">
-          <img
-            src="/assets/scene-6/s6_palace_baraat_bg.jpg"
-            alt=""
-            class="scene-6-bg-img"
-            draggable="false"
-          />
+          <picture>
+            <source srcset="/assets/scene-6/s6_palace_baraat_bg.webp" type="image/webp" />
+            <img
+              src="/assets/scene-6/s6_palace_baraat_bg.jpg"
+              width="1024"
+              height="576"
+              alt=""
+              class="scene-6-bg-img"
+              draggable="false"
+            />
+          </picture>
           <div class="scene-6-vignette"></div>
         </div>
         <!-- Parallax Procession Layer with Groom on Horse & Dholak Baraatis -->
         <div class="scene-6-procession-wrap" aria-hidden="true">
-          <img
-            src="/assets/scene-6/s6_baraat_procession.png"
-            alt="The Grand Baraat procession with groom on white horse and dancing baraatis"
-            class="scene-6-procession-img"
-            draggable="false"
-          />
+          <picture>
+            <source srcset="/assets/scene-6/s6_baraat_procession.webp" type="image/webp" />
+            <img
+              src="/assets/scene-6/s6_baraat_procession.png"
+              width="960"
+              height="720"
+              alt="The Grand Baraat procession with groom on white horse and dancing baraatis"
+              class="scene-6-procession-img"
+              draggable="false"
+            />
+          </picture>
         </div>
       </div>
 
@@ -279,12 +305,17 @@ export function createScene6() {
         <div class="scene-6-couple-bg-wrap">
           <div class="scene-6-couple-glow" aria-hidden="true"></div>
           <div class="scene-6-couple-img-wrap">
-            <img
-              src="/assets/scene-6/s6_couple_portrait.jpg"
-              alt="Sneha Sinha and Dipak Prasad in royal wedding attire"
-              class="scene-6-couple-img"
-              draggable="false"
-            />
+            <picture>
+              <source srcset="/assets/scene-6/s6_couple_portrait.webp" type="image/webp" />
+              <img
+                src="/assets/scene-6/s6_couple_portrait.jpg"
+                width="768"
+                height="960"
+                alt="Sneha Sinha and Dipak Prasad in royal wedding attire"
+                class="scene-6-couple-img"
+                draggable="false"
+              />
+            </picture>
           </div>
           <div class="scene-6-couple-frame-accent" aria-hidden="true"></div>
         </div>
@@ -293,12 +324,17 @@ export function createScene6() {
       <!-- View 3: Sacred Varmala Ceremony in Mandap -->
       <div class="scene-6-stage-view scene-6-view-varmala" data-view-stage="varmala" aria-hidden="true">
         <div class="scene-6-bg-wrap">
-          <img
-            src="/assets/scene-6/s6_varmala_mandap.jpg"
-            alt="Sacred varmala exchange ceremony under the grand floral mandap"
-            class="scene-6-bg-img"
-            draggable="false"
-          />
+          <picture>
+            <source srcset="/assets/scene-6/s6_varmala_mandap.webp" type="image/webp" />
+            <img
+              src="/assets/scene-6/s6_varmala_mandap.jpg"
+              width="1024"
+              height="683"
+              alt="Sacred varmala exchange ceremony under the grand floral mandap"
+              class="scene-6-bg-img"
+              draggable="false"
+            />
+          </picture>
           <div class="scene-6-vignette"></div>
         </div>
       </div>
@@ -306,16 +342,21 @@ export function createScene6() {
       <!-- View 4: Grand Fireworks Finale with Closing Card -->
       <div class="scene-6-stage-view scene-6-view-finale" data-view-stage="finale" aria-hidden="true">
         <div class="scene-6-bg-wrap">
-          <img
-            src="/assets/scene-6/s6_grand_fireworks.jpg"
-            alt=""
-            class="scene-6-bg-img"
-            draggable="false"
-          />
+          <picture>
+            <source srcset="/assets/scene-6/s6_grand_fireworks.webp" type="image/webp" />
+            <img
+              src="/assets/scene-6/s6_grand_fireworks.jpg"
+              width="1024"
+              height="576"
+              alt=""
+              class="scene-6-bg-img"
+              draggable="false"
+            />
+          </picture>
           <div class="scene-6-vignette scene-6-vignette--finale"></div>
         </div>
 
-        <!-- Stable Royal Closing Card (Real HTML Semantic Typography) -->
+        <!-- Stable Royal Closing Card -->
         <div class="scene-6-closing-wrap">
           <div class="scene-6-closing-card" role="region" aria-label="Closing Wedding Message">
             <div class="scene-6-closing-inner">
@@ -455,6 +496,13 @@ export function initScene6() {
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // ─── GSAP Context for Scene 6 ─────────────────────────────────────────────
+  if (gsapCtx) {
+    gsapCtx.revert();
+    gsapCtx = null;
+  }
+  gsapCtx = gsap.context(() => {}, scene6);
+
   // Dissolve incoming golden bloom smoothly
   const bloom = scene6.querySelector('.scene-6-incoming-bloom');
   if (bloom) {
@@ -501,7 +549,7 @@ export function initScene6() {
   // ─── Milestone Navigation Tab Listeners ────────────────────────────────────
   const pills = scene6.querySelectorAll('.scene-6-milestone-pill');
   pills.forEach((pill) => {
-    pill.addEventListener('click', (e) => {
+    pill.addEventListener('click', () => {
       const idx = parseInt(pill.getAttribute('data-index') || '0', 10);
       setStage(idx, true);
     });
@@ -644,6 +692,11 @@ export function destroyScene6() {
   clearAllTimers();
   cancelAnimationFrame(particleAnimFrame);
   ambientParticles = [];
+
+  if (gsapCtx) {
+    gsapCtx.revert();
+    gsapCtx = null;
+  }
 
   if (resizeHandler) {
     window.removeEventListener('resize', resizeHandler);
