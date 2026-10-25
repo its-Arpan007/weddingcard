@@ -333,9 +333,14 @@ export function createScene2() {
             “May Lord Ganesha bless this new journey with happiness, prosperity and endless love.”
           </p>
 
-          <div class="scene-2-scroll-hint" role="button" tabindex="0" aria-label="Continue to Scene 3">
-            <span>Scroll to Open Royal Curtains &amp; Reveal Invitation</span>
-            <span class="scene-2-arrow" aria-hidden="true">▾</span>
+          <div class="scene-2-scroll-action">
+            <button class="scene-2-scroll-btn" type="button" aria-label="Scroll down to reveal invitation">
+              <span class="scene-2-scroll-mouse" aria-hidden="true">
+                <span class="scene-2-scroll-wheel"></span>
+              </span>
+              <span class="scene-2-scroll-text">SCROLL DOWN</span>
+              <span class="scene-2-scroll-arrow" aria-hidden="true">↓</span>
+            </button>
           </div>
         </footer>
 
@@ -477,8 +482,8 @@ export function initScene2() {
     }
   }
 
-  // Handle scroll or click hint to progress to Scene 3
-  const scrollHint = scene2.querySelector('.scene-2-scroll-hint');
+  // Handle scroll down button or hint to progress to Scene 3
+  const scrollBtn = scene2.querySelector('.scene-2-scroll-btn') || scene2.querySelector('.scene-2-scroll-hint');
   const handleProceed = () => {
     if (window.sceneManager && window.sceneManager.isTransitioning()) return;
     if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
@@ -497,9 +502,9 @@ export function initScene2() {
     }
   };
 
-  if (scrollHint) {
-    scrollHint.addEventListener('click', handleProceed);
-    scrollHint.addEventListener('keydown', (e) => {
+  if (scrollBtn) {
+    scrollBtn.addEventListener('click', handleProceed);
+    scrollBtn.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         handleProceed();

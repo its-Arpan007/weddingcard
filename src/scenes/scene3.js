@@ -308,8 +308,8 @@ export function createScene3() {
       <!-- ==============================================
            THE ROYAL VELVET CURTAINS (Parting Open)
            ============================================== -->
-      <div class="scene-3-curtains" aria-hidden="true">
-        <div class="scene-3-curtain-crevice"></div>
+      <div class="scene-3-curtains" role="button" tabindex="0" aria-label="Royal velvet curtains. Scroll down or click to open.">
+        <div class="scene-3-curtain-crevice" aria-hidden="true"></div>
         <div class="scene-3-curtain-panel scene-3-curtain-panel--left">
           <picture>
             <source srcset="/assets/scene-3/s3_curtain_closed_left.webp" type="image/webp" />
@@ -338,6 +338,15 @@ export function createScene3() {
             />
           </picture>
         </div>
+
+        <!-- Interactive floating indicator when curtains are closed -->
+        <div class="scene-3-curtain-prompt" aria-hidden="true">
+          <span class="curtain-prompt-mouse">
+            <span class="curtain-prompt-wheel"></span>
+          </span>
+          <span class="curtain-prompt-text">SCROLL DOWN TO OPEN CURTAINS</span>
+          <span class="curtain-prompt-arrow">↓</span>
+        </div>
       </div>
 
       <!-- Incoming Golden Light Transition Bloom for Scene 2 Continuity -->
@@ -347,86 +356,166 @@ export function createScene3() {
   `;
 }
 
-let hasRevealedScene3 = false;
+let isCurtainOpen = false;
+let isCurtainAnimating = false;
 let scene3ResizeHandler = null;
 
 // ─── Scene 3 Lifecycle & Interaction ─────────────────────────────────────────
 
-export function initScene3() {
+export function initScene3(direction = 'down') {
   clearAllTimers();
 
   const scene3 = document.getElementById('scene-3');
   if (!scene3) return;
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  isCurtainAnimating = false;
 
-  if (hasRevealedScene3) {
-    // Curtains have already opened; keep them gracefully parted
-    scene3.classList.add('curtains-open', 'card-revealed');
-    gsap.set('.scene-3-curtains', { display: 'none' });
-    gsap.set('.scene-3-card-container', { opacity: 1, y: 0, scale: 1 });
-    gsap.set('.scene-3-peacocks-wrap', { opacity: 1, scale: 1, y: 0 });
-    gsap.set('.scene-3-fade-item', { opacity: 1, y: 0 });
-  } else {
-    // First time entering Scene 3
-    scene3.classList.remove('curtains-open', 'card-revealed');
-    gsap.set('.scene-3-curtains', { display: 'block' });
-    gsap.set('.scene-3-curtain-panel--left', { xPercent: 0 });
-    gsap.set('.scene-3-curtain-panel--right', { xPercent: 0 });
-    gsap.set('.scene-3-curtain-crevice', { opacity: 1 });
+  const curtains = scene3.querySelector('.scene-3-curtains');
+  const curtainPrompt = scene3.querySelector('.scene-3-curtain-prompt');
+  const card = scene3.querySelector('.scene-3-card');
+  if (card) card.scrollTop = 0;
 
-    gsapCtx = gsap.context(() => {
-      if (prefersReducedMotion) {
+  // Curtains Open Animation
+  function openCurtains(onComplete) {
+    if (isCurtainOpen || isCurtainAnimating) return;
+    const card = scene3.querySelector('.scene-3-card');
+    if (card) card.scrollTop = 0;
+    isCurtainAnimating = true;
+
+    if (prefersReducedMotion) {
+      isCurtainOpen = true;
+      isCurtainAnimating = false;
+      scene3.classList.add('curtains-open', 'card-revealed');
+      gsap.set('.scene-3-curtain-panel--left', { xPercent: -105 });
+      gsap.set('.scene-3-curtain-panel--right', { xPercent: 105 });
+      gsap.set('.scene-3-curtain-crevice', { opacity: 0 });
+      gsap.set('.scene-3-curtain-prompt', { opacity: 0, display: 'none' });
+      gsap.set('.scene-3-card-container', { opacity: 1, y: 0, scale: 1 });
+      gsap.set('.scene-3-peacocks-wrap', { opacity: 1, scale: 1, y: 0 });
+      gsap.set('.scene-3-fade-item', { opacity: 1, y: 0 });
+      if (curtains) curtains.style.pointerEvents = 'none';
+      if (typeof onComplete === 'function') onComplete();
+      return;
+    }
+
+    if (curtains) curtains.style.display = 'block';
+
+    const tl = gsap.timeline({
+      defaults: { ease: 'power2.inOut' },
+      onComplete: () => {
+        isCurtainOpen = true;
+        isCurtainAnimating = false;
         scene3.classList.add('curtains-open', 'card-revealed');
-        gsap.set('.scene-3-curtains', { display: 'none' });
-        gsap.set('.scene-3-card-container', { opacity: 1, y: 0, scale: 1 });
-        gsap.set('.scene-3-peacocks-wrap', { opacity: 1, scale: 1, y: 0 });
-        gsap.set('.scene-3-fade-item', { opacity: 1, y: 0 });
-        hasRevealedScene3 = true;
-        return;
-      }
+        if (curtains) curtains.style.pointerEvents = 'none';
+        if (typeof onComplete === 'function') onComplete();
+      },
+    });
 
-      const tl = gsap.timeline({
-        onComplete: () => {
-          scene3.classList.add('curtains-open', 'card-revealed');
-          hasRevealedScene3 = true;
-        },
-      });
-
-      // Part the velvet curtains gracefully
-      tl.to('.scene-3-curtain-crevice', {
-        opacity: 0,
-        duration: 0.35,
-        ease: 'power2.out',
-      }, 0.05)
-      .to('.scene-3-curtain-panel--left', {
-        xPercent: -105,
-        duration: 1.25,
-        ease: 'power2.inOut',
-      }, 0.1)
-      .to('.scene-3-curtain-panel--right', {
-        xPercent: 105,
-        duration: 1.25,
-        ease: 'power2.inOut',
-      }, 0.1)
-      .set('.scene-3-curtains', { display: 'none' })
+    tl.to('.scene-3-curtain-prompt', { opacity: 0, scale: 0.9, duration: 0.25 }, 0)
+      .to('.scene-3-curtain-crevice', { opacity: 0, duration: 0.35 }, 0.05)
+      .to('.scene-3-curtain-panel--left', { xPercent: -105, duration: 1.15 }, 0.1)
+      .to('.scene-3-curtain-panel--right', { xPercent: 105, duration: 1.15 }, 0.1)
       .fromTo('.scene-3-peacocks-wrap',
-        { opacity: 0, scale: 0.94, y: 15 },
+        { opacity: 0.15, scale: 0.94, y: 15 },
         { opacity: 1, scale: 1, y: 0, duration: 0.9, ease: 'power2.out' },
         0.35
       )
       .fromTo('.scene-3-card-container',
-        { opacity: 0, y: 24, scale: 0.95 },
+        { opacity: 0.15, y: 22, scale: 0.96 },
         { opacity: 1, y: 0, scale: 1, duration: 0.95, ease: 'power2.out' },
         0.45
       )
       .fromTo('.scene-3-fade-item',
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.55, stagger: 0.07, ease: 'power2.out' },
-        0.75
+        { opacity: 0, y: 8 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.05, ease: 'power2.out' },
+        0.65
       );
-    }, scene3);
   }
+
+  // Curtains Close Animation
+  function closeCurtains(onComplete) {
+    if (!isCurtainOpen || isCurtainAnimating) return;
+    isCurtainAnimating = true;
+
+    scene3.classList.remove('curtains-open');
+    const card = scene3.querySelector('.scene-3-card');
+    if (card) {
+      card.scrollTop = 0;
+    }
+    if (curtains) {
+      curtains.style.display = 'block';
+      curtains.style.pointerEvents = 'auto';
+    }
+
+    if (prefersReducedMotion) {
+      isCurtainOpen = false;
+      isCurtainAnimating = false;
+      gsap.set('.scene-3-curtain-panel--left', { xPercent: 0 });
+      gsap.set('.scene-3-curtain-panel--right', { xPercent: 0 });
+      gsap.set('.scene-3-curtain-crevice', { opacity: 0.95 });
+      gsap.set('.scene-3-curtain-prompt', { opacity: 1, display: 'inline-flex', scale: 1 });
+      gsap.set('.scene-3-card-container', { opacity: 0.15, scale: 0.96 });
+      gsap.set('.scene-3-peacocks-wrap', { opacity: 0.15 });
+      if (typeof onComplete === 'function') onComplete();
+      return;
+    }
+
+    const tl = gsap.timeline({
+      defaults: { ease: 'power2.inOut' },
+      onComplete: () => {
+        isCurtainOpen = false;
+        isCurtainAnimating = false;
+        if (typeof onComplete === 'function') onComplete();
+      },
+    });
+
+    tl.to('.scene-3-card-container', { opacity: 0.15, scale: 0.96, duration: 0.65, ease: 'power2.in' }, 0)
+      .to('.scene-3-peacocks-wrap', { opacity: 0.15, duration: 0.65 }, 0)
+      .to('.scene-3-curtain-panel--left', { xPercent: 0, duration: 1.05 }, 0.05)
+      .to('.scene-3-curtain-panel--right', { xPercent: 0, duration: 1.05 }, 0.05)
+      .to('.scene-3-curtain-crevice', { opacity: 0.95, duration: 0.45 }, 0.7)
+      .set('.scene-3-curtain-prompt', { display: 'inline-flex' }, 0.65)
+      .to('.scene-3-curtain-prompt', { opacity: 1, scale: 1, duration: 0.45 }, 0.75);
+  }
+
+  // Initial State Setup based on Navigation Direction
+  if (direction === 'up') {
+    // Coming backwards from Scene 4: start open
+    isCurtainOpen = true;
+    scene3.classList.add('curtains-open', 'card-revealed');
+    gsap.set('.scene-3-curtain-panel--left', { xPercent: -105 });
+    gsap.set('.scene-3-curtain-panel--right', { xPercent: 105 });
+    gsap.set('.scene-3-curtain-crevice', { opacity: 0 });
+    gsap.set('.scene-3-curtain-prompt', { opacity: 0, display: 'none' });
+    gsap.set('.scene-3-card-container', { opacity: 1, y: 0, scale: 1 });
+    gsap.set('.scene-3-peacocks-wrap', { opacity: 1, scale: 1, y: 0 });
+    gsap.set('.scene-3-fade-item', { opacity: 1, y: 0 });
+    if (curtains) curtains.style.pointerEvents = 'none';
+  } else {
+    // Coming from Scene 2 (downwards) or initial load: start closed
+    isCurtainOpen = false;
+    scene3.classList.remove('curtains-open');
+    gsap.set('.scene-3-curtain-panel--left', { xPercent: 0 });
+    gsap.set('.scene-3-curtain-panel--right', { xPercent: 0 });
+    gsap.set('.scene-3-curtain-crevice', { opacity: 0.95 });
+    gsap.set('.scene-3-curtain-prompt', { opacity: 1, display: 'inline-flex', scale: 1 });
+    gsap.set('.scene-3-card-container', { opacity: 0.15, scale: 0.96 });
+    gsap.set('.scene-3-peacocks-wrap', { opacity: 0.15 });
+    if (curtains) {
+      curtains.style.display = 'block';
+      curtains.style.pointerEvents = 'auto';
+    }
+  }
+
+  // Click on closed curtains or prompt opens them
+  const handleCurtainClick = () => {
+    if (!isCurtainOpen && !isCurtainAnimating) {
+      openCurtains();
+    }
+  };
+  if (curtains) curtains.addEventListener('click', handleCurtainClick);
+  if (curtainPrompt) curtainPrompt.addEventListener('click', handleCurtainClick);
 
   // Dissolve incoming golden bloom smoothly
   const bloom = scene3.querySelector('.scene-3-incoming-bloom');
@@ -494,53 +583,75 @@ export function initScene3() {
     });
   }
 
-  // Support mousewheel scroll with card overscroll safety buffer
+  // Mousewheel scroll handling:
+  // - Scrolling down: opens curtains if closed; proceeds to Scene 4 if open and at bottom
+  // - Scrolling up: closes curtains if open; proceeds to Scene 2 if closed
   let cardOverscrollY = 0;
   let overscrollResetTimer = null;
 
   window._scene3WheelHandler = (e) => {
     if (window.sceneManager && window.sceneManager.isTransitioning()) return;
+    if (isCurtainAnimating) return;
 
     const card = scene3.querySelector('.scene-3-card');
-    if (!card) return;
-
-    const isScrollable = card.scrollHeight > card.clientHeight + 15;
-    const isAtBottom = isScrollable
+    const isScrollable = card ? card.scrollHeight > card.clientHeight + 15 : false;
+    const isAtBottom = card && isScrollable
       ? card.scrollTop + card.clientHeight >= card.scrollHeight - 12
       : true;
-    const isAtTop = isScrollable
+    const isAtTop = card && isScrollable
       ? card.scrollTop <= 6
       : true;
 
-    // If card is scrollable and scrolling within content, permit natural internal scroll
-    if (isScrollable) {
-      if ((e.deltaY > 0 && !isAtBottom) || (e.deltaY < 0 && !isAtTop)) {
+    // Scrolling DOWN
+    if (e.deltaY > 0) {
+      if (!isCurtainOpen) {
+        openCurtains();
+        return;
+      }
+
+      // If card has scrollable content, let it scroll down internally first
+      if (isScrollable && !isAtBottom) {
         cardOverscrollY = 0;
         return;
       }
+
+      cardOverscrollY += e.deltaY;
+      if (overscrollResetTimer) clearTimeout(overscrollResetTimer);
+      overscrollResetTimer = setTimeout(() => { cardOverscrollY = 0; }, 220);
+
+      if (cardOverscrollY >= 60) {
+        cardOverscrollY = 0;
+        proceedToScene4();
+      }
     }
+    // Scrolling UP
+    else if (e.deltaY < 0) {
+      if (isCurtainOpen) {
+        // If card was scrolled down, let it scroll up internally first
+        if (isScrollable && !isAtTop) {
+          cardOverscrollY = 0;
+          return;
+        }
 
-    cardOverscrollY += e.deltaY;
+        // Card is at top: scrolling up closes the curtains!
+        closeCurtains();
+        return;
+      }
 
-    if (overscrollResetTimer) clearTimeout(overscrollResetTimer);
-    overscrollResetTimer = setTimeout(() => {
-      cardOverscrollY = 0;
-    }, 220);
+      // Curtains already closed: scrolling up returns to Scene 2
+      cardOverscrollY += e.deltaY;
+      if (overscrollResetTimer) clearTimeout(overscrollResetTimer);
+      overscrollResetTimer = setTimeout(() => { cardOverscrollY = 0; }, 220);
 
-    // Scroll Down -> Scene 4 (require deliberate overscroll: 60px)
-    if (e.deltaY > 0 && isAtBottom && cardOverscrollY >= 60) {
-      cardOverscrollY = 0;
-      proceedToScene4();
-    }
-    // Scroll Up -> Scene 2 (require deliberate overscroll: -60px)
-    else if (e.deltaY < 0 && isAtTop && cardOverscrollY <= -60) {
-      cardOverscrollY = 0;
-      proceedToScene2();
+      if (cardOverscrollY <= -50) {
+        cardOverscrollY = 0;
+        proceedToScene2();
+      }
     }
   };
   window.addEventListener('wheel', window._scene3WheelHandler, { passive: true });
 
-  // Support mobile touch swipe with internal card scroll awareness
+  // Mobile touch swipe handling
   let touchStartY = 0;
   let touchStartX = 0;
 
@@ -553,11 +664,13 @@ export function initScene3() {
 
   window._scene3TouchEndHandler = (e) => {
     if (window.sceneManager && window.sceneManager.isTransitioning()) return;
+    if (isCurtainAnimating) return;
+
     if (e.changedTouches && e.changedTouches.length > 0) {
       const deltaY = touchStartY - e.changedTouches[0].clientY;
       const deltaX = Math.abs(touchStartX - e.changedTouches[0].clientX);
 
-      if (Math.abs(deltaY) < deltaX || Math.abs(deltaY) < 55) return;
+      if (Math.abs(deltaY) < deltaX || Math.abs(deltaY) < 45) return;
 
       const card = scene3.querySelector('.scene-3-card');
       const isScrollable = card ? card.scrollHeight > card.clientHeight + 15 : false;
@@ -568,10 +681,21 @@ export function initScene3() {
         ? card.scrollTop <= 6
         : true;
 
-      if (deltaY > 55 && isAtBottom) {
-        proceedToScene4();
-      } else if (deltaY < -55 && isAtTop) {
-        proceedToScene2();
+      // Swipe UP (finger up = scroll down)
+      if (deltaY > 45) {
+        if (!isCurtainOpen) {
+          openCurtains();
+        } else if (isAtBottom) {
+          proceedToScene4();
+        }
+      }
+      // Swipe DOWN (finger down = scroll up)
+      else if (deltaY < -45) {
+        if (isCurtainOpen && isAtTop) {
+          closeCurtains();
+        } else if (!isCurtainOpen) {
+          proceedToScene2();
+        }
       }
     }
   };
@@ -584,6 +708,7 @@ export function destroyScene3() {
   clearAllTimers();
   cancelAnimationFrame(particleAnimFrame);
   ambientParticles = [];
+  isCurtainAnimating = false;
 
   if (window._scene3WheelHandler) {
     window.removeEventListener('wheel', window._scene3WheelHandler);
@@ -601,6 +726,4 @@ export function destroyScene3() {
     window.removeEventListener('resize', scene3ResizeHandler);
     scene3ResizeHandler = null;
   }
-
-  // Keep curtains and elements revealed so returning backwards is instant and clean
 }

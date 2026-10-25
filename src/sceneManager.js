@@ -65,8 +65,12 @@ export function goToScene(sceneNum, forcedDirection = null) {
   // Ensure target DOM element exists
   let targetEl = document.getElementById(`scene-${sceneNum}`);
   if (!targetEl) {
-    const html = targetDef.create();
-    app.insertAdjacentHTML('beforeend', html);
+    const content = targetDef.create();
+    if (typeof content === 'string') {
+      app.insertAdjacentHTML('beforeend', content);
+    } else if (content instanceof Node) {
+      app.appendChild(content);
+    }
     targetEl = document.getElementById(`scene-${sceneNum}`);
   }
 
@@ -79,7 +83,7 @@ export function goToScene(sceneNum, forcedDirection = null) {
       targetEl.classList.add('active');
     }
     try {
-      targetDef.init();
+      targetDef.init(direction);
     } catch (err) {
       console.error(`Error initializing scene ${sceneNum}:`, err);
     }
@@ -110,7 +114,7 @@ export function goToScene(sceneNum, forcedDirection = null) {
 
     // Initialize incoming scene
     try {
-      targetDef.init();
+      targetDef.init(direction);
     } catch (err) {
       console.error(`Error initializing scene ${sceneNum}:`, err);
     }
