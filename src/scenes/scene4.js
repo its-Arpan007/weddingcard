@@ -742,6 +742,7 @@ export function initScene4() {
   let wheelTimer = null;
   const wheelHandler = (e) => {
     if (isTransitioning) return;
+    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
     const scrollContainer = scene4.querySelector('.scene-4-scroll-container');
     const isAtBottom = scrollContainer
       ? scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 25
@@ -752,9 +753,9 @@ export function initScene4() {
       if (!wheelTimer) {
         wheelTimer = setTimeout(() => {
           if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-            window.sceneManager.goToScene(5);
+            window.sceneManager.goToScene(5, 'down');
           } else {
-            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5 } }));
+            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5, direction: 'down' } }));
           }
           wheelTimer = null;
         }, 150);
@@ -763,9 +764,9 @@ export function initScene4() {
       if (!wheelTimer) {
         wheelTimer = setTimeout(() => {
           if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-            window.sceneManager.goToScene(3);
+            window.sceneManager.goToScene(3, 'up');
           } else {
-            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3 } }));
+            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3, direction: 'up' } }));
           }
           wheelTimer = null;
         }, 150);
@@ -779,7 +780,9 @@ export function initScene4() {
     if (e.touches && e.touches.length > 0) touchStartY = e.touches[0].clientY;
   };
   const touchEndHandler = (e) => {
-    if (e.changedTouches && e.changedTouches.length > 0 && !isTransitioning) {
+    if (isTransitioning) return;
+    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
+    if (e.changedTouches && e.changedTouches.length > 0) {
       const deltaY = touchStartY - e.changedTouches[0].clientY;
       const scrollContainer = scene4.querySelector('.scene-4-scroll-container');
       const isAtBottom = scrollContainer
@@ -789,15 +792,15 @@ export function initScene4() {
 
       if (deltaY > 60 && isAtBottom) {
         if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-          window.sceneManager.goToScene(5);
+          window.sceneManager.goToScene(5, 'down');
         } else {
-          window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5 } }));
+          window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5, direction: 'down' } }));
         }
       } else if (deltaY < -60 && isAtTop) {
         if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-          window.sceneManager.goToScene(3);
+          window.sceneManager.goToScene(3, 'up');
         } else {
-          window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3 } }));
+          window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3, direction: 'up' } }));
         }
       }
     }

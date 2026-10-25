@@ -2,8 +2,8 @@
  * Scene Manager — Six-Scene Architecture
  *
  * Manages scene transitions, lifecycle (create, init, destroy),
- * and provides a global navigation API.
- * High-performance edition with zero-layout-thrash transitions.
+ * and provides a global navigation API with ultra-smooth kinetic transitions,
+ * directional slide-and-fade physics, and momentum-damping gesture protection.
  */
 
 import { createScene1, initScene1, destroyScene1 } from './scenes/scene1.js';
@@ -23,89 +23,129 @@ const scenes = {
 };
 
 let currentScene = null;
-const removalTimeouts = {};
+let isNavigating = false;
+let navigationCooldownTimer = null;
+let inertiaUnlockTimer = null;
 
 /**
- * Navigate to a scene by number.
- * @param {number} sceneNum - Scene number (1-6)
+ * Returns whether a transition or cooldown is currently active.
+ * @returns {boolean}
  */
-function goToScene(sceneNum) {
+export function isTransitioning() {
+  return isNavigating;
+}
+
+/**
+ * Navigate to a scene by number with directional kinetic slide-and-fade.
+ * @param {number} sceneNum - Scene number (1-6)
+ * @param {'down'|'up'|null} forcedDirection - Direction of travel ('down' | 'up')
+ */
+export function goToScene(sceneNum, forcedDirection = null) {
   const app = document.getElementById('app');
   if (!app) return;
 
-  if (sceneNum === currentScene) return;
+  if (sceneNum === currentScene || isNavigating) return;
 
-  const sceneDef = scenes[sceneNum];
-  if (!sceneDef) {
+  const targetDef = scenes[sceneNum];
+  if (!targetDef) {
     console.warn(`Scene ${sceneNum} not found.`);
     return;
   }
 
-  // Cancel any pending DOM removal for this target scene
-  if (removalTimeouts[sceneNum]) {
-    clearTimeout(removalTimeouts[sceneNum]);
-    delete removalTimeouts[sceneNum];
-  }
-
   const prevSceneNum = currentScene;
+  const direction = forcedDirection || (prevSceneNum && sceneNum < prevSceneNum ? 'up' : 'down');
+
+  isNavigating = true;
   currentScene = sceneNum;
 
-  // Check if scene DOM already exists
-  let sceneEl = document.getElementById(`scene-${sceneNum}`);
-  if (!sceneEl) {
-    const html = sceneDef.create();
+  // Clear any existing cooldown timers
+  if (navigationCooldownTimer) clearTimeout(navigationCooldownTimer);
+  if (inertiaUnlockTimer) clearTimeout(inertiaUnlockTimer);
+
+  // Ensure target DOM element exists
+  let targetEl = document.getElementById(`scene-${sceneNum}`);
+  if (!targetEl) {
+    const html = targetDef.create();
     app.insertAdjacentHTML('beforeend', html);
-    sceneEl = document.getElementById(`scene-${sceneNum}`);
+    targetEl = document.getElementById(`scene-${sceneNum}`);
   }
 
-  // Smoothly activate new scene via requestAnimationFrame
-  if (sceneEl) {
-    sceneEl.style.opacity = '';
-    sceneEl.style.pointerEvents = '';
-    sceneEl.style.transition = '';
-    requestAnimationFrame(() => {
-      sceneEl.classList.add('active');
-    });
-  }
+  const prevEl = prevSceneNum ? document.getElementById(`scene-${prevSceneNum}`) : null;
 
-  // Initialize the new scene
-  sceneDef.init();
-
-  // Stop previous scene's animation loops immediately to free up GPU & CPU during transition
-  if (prevSceneNum && prevSceneNum !== sceneNum && scenes[prevSceneNum]) {
+  if (!prevEl) {
+    // Initial load on page start (Scene 1)
+    if (targetEl) {
+      targetEl.classList.remove('enter-from-down', 'enter-from-up', 'exit-up', 'exit-down');
+      targetEl.classList.add('active');
+    }
     try {
-      scenes[prevSceneNum].destroy();
-    } catch {
-      // safe cleanup
+      targetDef.init();
+    } catch (err) {
+      console.error(`Error initializing scene ${sceneNum}:`, err);
     }
+    isNavigating = false;
+    return;
+  }
 
-    const prevEl = document.getElementById(`scene-${prevSceneNum}`);
-    if (prevEl) {
-      prevEl.classList.remove('active');
-      prevEl.style.opacity = '0';
-      prevEl.style.pointerEvents = 'none';
-      prevEl.style.transition = 'opacity 0.4s ease-out';
-      
-      const sNum = prevSceneNum;
-      removalTimeouts[sNum] = setTimeout(() => {
-        if (currentScene !== sNum && prevEl.parentNode) {
-          prevEl.remove();
+  // Directional positioning classes for smooth kinetic gliding
+  const enterClass = direction === 'down' ? 'enter-from-down' : 'enter-from-up';
+  const exitClass = direction === 'down' ? 'exit-up' : 'exit-down';
+
+  // Position target scene off-screen in preparation
+  targetEl.classList.remove('active', 'exit-up', 'exit-down', 'enter-from-down', 'enter-from-up');
+  targetEl.classList.add(enterClass);
+
+  // Force layout flush so the browser establishes the starting transform
+  void targetEl.offsetWidth;
+
+  // Next frame: smoothly transition both scenes simultaneously
+  requestAnimationFrame(() => {
+    // Outgoing scene slides and fades away smoothly
+    prevEl.classList.remove('active');
+    prevEl.classList.add(exitClass);
+
+    // Incoming scene glides into place
+    targetEl.classList.remove(enterClass);
+    targetEl.classList.add('active');
+
+    // Initialize incoming scene
+    try {
+      targetDef.init();
+    } catch (err) {
+      console.error(`Error initializing scene ${sceneNum}:`, err);
+    }
+  });
+
+  // After CSS visual transition completes (700ms):
+  navigationCooldownTimer = setTimeout(() => {
+    if (prevEl && prevSceneNum !== currentScene) {
+      prevEl.classList.remove('exit-up', 'exit-down');
+      // Cleanly suspend outgoing scene's animation loops (keeping DOM rendered & intact)
+      if (scenes[prevSceneNum] && typeof scenes[prevSceneNum].destroy === 'function') {
+        try {
+          scenes[prevSceneNum].destroy();
+        } catch {
+          // safe cleanup
         }
-        delete removalTimeouts[sNum];
-      }, 420);
+      }
     }
+
+    // Cooldown lock window: absorb residual wheel momentum or touch bounce (200ms)
+    inertiaUnlockTimer = setTimeout(() => {
+      isNavigating = false;
+    }, 200);
+  }, 720);
+}
+
+export function prevScene() {
+  if (currentScene > 1 && !isNavigating) {
+    goToScene(currentScene - 1, 'up');
   }
 }
 
-function prevScene() {
-  if (currentScene > 1) {
-    goToScene(currentScene - 1);
-  }
-}
-
-function nextScene() {
-  if (currentScene < 6) {
-    goToScene(currentScene + 1);
+export function nextScene() {
+  if (currentScene < 6 && !isNavigating) {
+    goToScene(currentScene + 1, 'down');
   }
 }
 
@@ -118,12 +158,18 @@ export function initSceneManager() {
   if (!app) return;
 
   // Expose global API
-  window.sceneManager = { goToScene, prevScene, nextScene, getCurrentScene: () => currentScene };
+  window.sceneManager = {
+    goToScene,
+    prevScene,
+    nextScene,
+    getCurrentScene: () => currentScene,
+    isTransitioning: () => isNavigating,
+  };
 
   // Listen for custom navigation events
   window.addEventListener('scene:navigate', (e) => {
-    const { scene } = e.detail || {};
-    if (scene) goToScene(scene);
+    const { scene, direction } = e.detail || {};
+    if (scene) goToScene(scene, direction);
   });
 
   // Start at Scene 1

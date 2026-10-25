@@ -623,10 +623,11 @@ export function initScene6() {
         if (currentStageIndex > 0) {
           setStage(currentStageIndex - 1, true);
         } else {
+          if (window.sceneManager && window.sceneManager.isTransitioning()) return;
           if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-            window.sceneManager.goToScene(5);
+            window.sceneManager.goToScene(5, 'up');
           } else {
-            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5 } }));
+            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5, direction: 'up' } }));
           }
         }
       }

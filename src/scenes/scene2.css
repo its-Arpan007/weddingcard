@@ -15,14 +15,6 @@
   max-height: 100dvh;
   overflow: hidden;
   background-color: #0d0206;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.scene-2.active {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 /* --- Common Full-Screen Layer Shell --- */
@@ -80,18 +72,105 @@
 }
 
 /* ============================================
-   LAYER 3: Celestial Halo Mandala behind Deity
+   LAYER 3: Hanging Bells & Garlands (1672x941)
+   ============================================ */
+.scene-2-layer--bells {
+  z-index: 4;
+}
+
+.scene-2-img--bells {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  transform-origin: 50% 0%;
+  opacity: 1;
+  animation: scene2-bellsSway 7s ease-in-out infinite alternate;
+}
+
+/* ============================================
+   LAYER 4: Foreground Steps & Lamps (1671x941)
+   ============================================ */
+.scene-2-layer--diya {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.scene-2-img--diya {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  opacity: 1;
+}
+
+/* Warm flicker overlay across foreground lamps */
+.scene-2-diya-flicker-layer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 92%, rgba(255, 185, 65, 0.14) 0%, transparent 65%);
+  pointer-events: none;
+  animation: scene2-diyaFlicker 3.2s ease-in-out infinite alternate;
+}
+
+/* ============================================
+   LAYER 5: Central Deity Stage — Lord Ganesha on Pedestal
+   Positioned prominently in the middle of temple sanctuary
+   ============================================ */
+.scene-2-deity-stage {
+  position: absolute;
+  top: clamp(43%, 46.5vh, 48%);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.scene-2-ganesh-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+  pointer-events: none;
+}
+
+.scene-2-img--ganesh {
+  height: clamp(270px, 49vh, 520px);
+  max-width: min(92vw, 760px);
+  width: auto;
+  object-fit: contain;
+  display: block;
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  filter:
+    drop-shadow(0 15px 35px rgba(0, 0, 0, 0.85))
+    drop-shadow(0 0 25px rgba(245, 207, 104, 0.28));
+}
+
+/* ============================================
+   CELESTIAL HALO MANDALA (Centered on Crown)
+   Anchored directly at center of Lord Ganesha's crown:
+   X = 50%, Y = 14% of deity image
    ============================================ */
 .scene-2-halo-wrap {
   position: absolute;
-  top: clamp(170px, 31vh, 330px);
+  top: 14%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(420px, 56vh);
-  height: min(420px, 56vh);
+  width: clamp(220px, 38vh, 420px);
+  height: clamp(220px, 38vh, 420px);
   pointer-events: none;
-  z-index: 4;
-  opacity: 0.65;
+  z-index: 1;
+  opacity: 0.8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,95 +190,22 @@
   height: 100%;
   animation: scene2-rotateMandala 40s linear infinite;
   filter: drop-shadow(0 0 16px rgba(245, 207, 104, 0.8));
-}
-
-/* ============================================
-   LAYER 4: Hanging Bells & Garlands (1672x941)
-   ============================================ */
-.scene-2-layer--bells {
-  z-index: 5;
-}
-
-.scene-2-img--bells {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center bottom;
-  transform-origin: 50% 0%;
-  opacity: 1;
-  animation: scene2-bellsSway 7s ease-in-out infinite alternate;
-}
-
-/* ============================================
-   LAYER 5: Central Deity — Lord Ganesha on Pedestal
-   ============================================ */
-.scene-2-layer--ganesh {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 6;
-  pointer-events: none;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.scene-2-img--ganesh {
-  height: clamp(350px, 63vh, 700px);
-  max-width: min(92vw, 860px);
-  width: auto;
-  object-fit: contain;
-  margin-bottom: clamp(14px, 3.2vh, 38px);
-  filter:
-    drop-shadow(0 15px 35px rgba(0, 0, 0, 0.85))
-    drop-shadow(0 0 25px rgba(245, 207, 104, 0.28));
+  transform-origin: 50% 50%;
 }
 
 /* Pedestal Warm Aura */
 .scene-2-pedestal-glow {
   position: absolute;
-  bottom: clamp(15px, 3.2vh, 40px);
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: min(580px, 72vw);
-  height: 30%;
-  background: radial-gradient(ellipse at center, rgba(255, 195, 80, 0.28) 0%, transparent 70%);
+  width: min(580px, 85%);
+  height: 35%;
+  background: radial-gradient(ellipse at center, rgba(255, 195, 80, 0.32) 0%, transparent 70%);
   filter: blur(18px);
   pointer-events: none;
+  z-index: 3;
   animation: scene2-flameGlow 3s ease-in-out infinite alternate;
-}
-
-/* ============================================
-   LAYER 6: Foreground Steps & Lamps (1671x941)
-   ============================================ */
-.scene-2-layer--diya {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 7;
-  pointer-events: none;
-}
-
-.scene-2-img--diya {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center bottom;
-  opacity: 1;
-}
-
-/* Warm flicker overlay across foreground lamps */
-.scene-2-diya-flicker-layer {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 92%, rgba(255, 185, 65, 0.14) 0%, transparent 65%);
-  pointer-events: none;
-  animation: scene2-diyaFlicker 3.2s ease-in-out infinite alternate;
 }
 
 /* Ambient Particles Canvas */
@@ -544,19 +550,17 @@
   }
 
   .scene-2-img--ganesh {
-    height: clamp(320px, 58vh, 580px);
-    margin-bottom: clamp(14px, 3.2vh, 36px);
-  }
-
-  .scene-2-plaque {
-    padding: 0.42rem 1.15rem 0.36rem 1.15rem;
-    max-width: min(470px, 92vw);
+    height: clamp(280px, 48vh, 460px);
   }
 
   .scene-2-halo-wrap {
-    top: clamp(165px, 29vh, 290px);
-    width: min(360px, 52vh);
-    height: min(360px, 52vh);
+    width: clamp(200px, 36vh, 360px);
+    height: clamp(200px, 36vh, 360px);
+  }
+
+  .scene-2-plaque {
+    padding: 0.38rem 1.1rem 0.32rem 1.1rem;
+    max-width: min(470px, 92vw);
   }
 }
 
@@ -581,20 +585,22 @@
     margin: 0;
   }
 
+  .scene-2-deity-stage {
+    top: clamp(41%, 44vh, 46%);
+  }
+
   .scene-2-img--ganesh {
-    height: clamp(240px, 45vh, 380px);
+    height: clamp(230px, 42vh, 350px);
     max-width: 92vw;
-    margin-bottom: clamp(10px, 2.2vh, 22px);
   }
 
   .scene-2-halo-wrap {
-    width: min(280px, 68vw);
-    height: min(280px, 68vw);
-    top: clamp(140px, 26vh, 210px);
+    width: min(270px, 66vw);
+    height: min(270px, 66vw);
   }
 
   .scene-2-plaque {
-    padding: 0.36rem 0.75rem 0.3rem 0.75rem;
+    padding: 0.32rem 0.75rem 0.28rem 0.75rem;
     border-radius: 12px;
     max-width: min(390px, 94vw);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
@@ -630,29 +636,39 @@
 
 /* Extra Compact Phones & Short Viewports (<= 480px width or <= 680px height) */
 @media (max-width: 480px), (max-height: 680px) {
+  .scene-2-deity-stage {
+    top: clamp(40%, 43.5vh, 45%);
+  }
+
   .scene-2-img--ganesh {
-    height: clamp(200px, 40vh, 310px);
+    height: clamp(210px, 44vh, 310px);
   }
 
   .scene-2-halo-wrap {
-    width: min(240px, 62vw);
-    height: min(240px, 62vw);
-    top: clamp(120px, 24vh, 180px);
+    width: min(230px, 34vh);
+    height: min(230px, 34vh);
   }
 
   .scene-2-plaque {
-    padding: 0.3rem 0.65rem 0.25rem 0.65rem;
-    max-width: min(350px, 95vw);
+    padding: 0.26rem 0.75rem 0.2rem 0.75rem;
+    max-width: min(440px, 94vw);
   }
 
   .scene-2-shloka {
     font-size: 0.74rem;
-    line-height: 1.32;
+    line-height: 1.3;
   }
 
   .scene-2-blessing {
-    font-size: 0.76rem;
-    line-height: 1.32;
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .scene-2-scroll-hint {
+    min-height: 32px;
+    padding: 2px 8px;
+    margin-top: 0.1rem;
+    font-size: 0.54rem;
   }
 }
 
@@ -664,7 +680,7 @@
   .scene-2-halo-glow,
   .scene-2-halo-svg,
   .scene-2-img--bells,
-  .scene-2-layer--ganesh,
+  .scene-2-deity-stage,
   .scene-2-img--diya,
   .scene-2-header,
   .scene-2-plaque,

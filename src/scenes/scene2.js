@@ -174,68 +174,7 @@ export function createScene2() {
       </div>
 
       <!-- ==============================================
-           LAYER 3: Celestial Halo Mandala behind Deity
-           ============================================== -->
-      <div class="scene-2-halo-wrap" aria-hidden="true">
-        <div class="scene-2-halo-glow"></div>
-        <svg
-          class="scene-2-halo-svg"
-          viewBox="0 0 400 400"
-          width="380"
-          height="380"
-        >
-          <defs>
-            <linearGradient id="ganeshGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#fff7d6" />
-              <stop offset="40%" stop-color="#f5cf68" />
-              <stop offset="70%" stop-color="#d4af37" />
-              <stop offset="100%" stop-color="#996515" />
-            </linearGradient>
-            <radialGradient id="ganeshSunburst" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="rgba(255, 245, 210, 0.9)" />
-              <stop offset="50%" stop-color="rgba(245, 207, 104, 0.45)" />
-              <stop offset="100%" stop-color="rgba(140, 90, 16, 0)" />
-            </radialGradient>
-          </defs>
-
-          <!-- 24 Divine Radiant Rays -->
-          ${Array.from({ length: 24 }).map((_, i) => {
-            const angle = (i * 15 * Math.PI) / 180;
-            const x2 = 200 + 190 * Math.cos(angle);
-            const y2 = 200 + 190 * Math.sin(angle);
-            return `<line x1="200" y1="200" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="url(#ganeshGoldGrad)" stroke-width="1.2" stroke-dasharray="4 6" opacity="0.6"/>`;
-          }).join('')}
-
-          <!-- Concentric Sacred Circles -->
-          <circle cx="200" cy="200" r="185" fill="none" stroke="url(#ganeshGoldGrad)" stroke-width="2" stroke-dasharray="3 3" opacity="0.7" />
-          <circle cx="200" cy="200" r="170" fill="none" stroke="url(#ganeshGoldGrad)" stroke-width="1.5" />
-          <circle cx="200" cy="200" r="145" fill="none" stroke="url(#ganeshGoldGrad)" stroke-width="2.5" />
-          <circle cx="200" cy="200" r="120" fill="none" stroke="url(#ganeshGoldGrad)" stroke-width="1.5" stroke-dasharray="5 3" />
-          <circle cx="200" cy="200" r="80" fill="none" stroke="url(#ganeshGoldGrad)" stroke-width="2" />
-          <circle cx="200" cy="200" r="60" fill="url(#ganeshSunburst)" stroke="url(#ganeshGoldGrad)" stroke-width="1.5" />
-
-          <!-- 16 Outer Sacred Lotus Petals -->
-          ${Array.from({ length: 16 }).map((_, i) => {
-            const angle = (i * 22.5 * Math.PI) / 180;
-            const x = 200 + 145 * Math.cos(angle);
-            const y = 200 + 145 * Math.sin(angle);
-            const rot = i * 22.5 + 90;
-            return `<path d="M 0,0 C -12,-20 -15,-40 0,-55 C 15,-40 12,-20 0,0 Z" transform="translate(${x.toFixed(1)}, ${y.toFixed(1)}) rotate(${rot.toFixed(1)})" fill="rgba(245, 207, 104, 0.18)" stroke="url(#ganeshGoldGrad)" stroke-width="1.5" />`;
-          }).join('')}
-
-          <!-- 12 Inner Sacred Lotus Petals -->
-          ${Array.from({ length: 12 }).map((_, i) => {
-            const angle = (i * 30 * Math.PI) / 180;
-            const x = 200 + 80 * Math.cos(angle);
-            const y = 200 + 80 * Math.sin(angle);
-            const rot = i * 30 + 90;
-            return `<path d="M 0,0 C -8,-14 -10,-28 0,-38 C 10,-28 8,-14 0,0 Z" transform="translate(${x.toFixed(1)}, ${y.toFixed(1)}) rotate(${rot.toFixed(1)})" fill="rgba(255, 247, 214, 0.28)" stroke="url(#ganeshGoldGrad)" stroke-width="1.5" />`;
-          }).join('')}
-        </svg>
-      </div>
-
-      <!-- ==============================================
-           LAYER 4: Hanging Bells and Floral Garlands
+           LAYER 3: Hanging Bells and Floral Garlands
            ============================================== -->
       <div class="scene-2-layer scene-2-layer--bells" aria-hidden="true">
         <picture>
@@ -254,27 +193,7 @@ export function createScene2() {
       </div>
 
       <!-- ==============================================
-           LAYER 5: Central Deity — Lord Ganesha on Pedestal
-           ============================================== -->
-      <div class="scene-2-layer scene-2-layer--ganesh" role="img" aria-label="Lord Ganesha seated on an ornate golden lotus pedestal in temple sanctuary">
-        <picture>
-          <source srcset="/assets/scene-2/s2_ganesh_pedestal.webp" type="image/webp" />
-          <img
-            src="/assets/scene-2/s2_ganesh_pedestal.png"
-            alt="Lord Ganesha"
-            class="scene-2-img scene-2-img--ganesh"
-            loading="eager"
-            decoding="async"
-            width="1366"
-            height="1152"
-            draggable="false"
-          />
-        </picture>
-        <div class="scene-2-pedestal-glow" aria-hidden="true"></div>
-      </div>
-
-      <!-- ==============================================
-           LAYER 6: Foreground Tiered Steps with Glowing Diyas
+           LAYER 4: Foreground Tiered Steps with Glowing Diyas
            ============================================== -->
       <div class="scene-2-layer scene-2-layer--diya" aria-hidden="true">
         <picture>
@@ -292,6 +211,88 @@ export function createScene2() {
         </picture>
         <!-- Ambient warm flicker across foreground lamps -->
         <div class="scene-2-diya-flicker-layer" aria-hidden="true"></div>
+      </div>
+
+      <!-- ==============================================
+           LAYER 5: Central Deity Stage — Lord Ganesha with Crown Rotating Halo
+           Placed prominently in the middle of temple sanctuary
+           ============================================== -->
+      <div class="scene-2-deity-stage" role="img" aria-label="Lord Ganesha seated on an ornate golden lotus pedestal in temple sanctuary">
+        <div class="scene-2-ganesh-wrap">
+          <!-- Celestial Halo Mandala directly centered at Lord Ganesha's crown -->
+          <div class="scene-2-halo-wrap" aria-hidden="true">
+            <div class="scene-2-halo-glow"></div>
+            <svg
+              class="scene-2-halo-svg"
+              viewBox="0 0 400 400"
+              width="400"
+              height="400"
+            >
+              <defs>
+                <linearGradient id="ganeshGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fff7d6" />
+                  <stop offset="40%" stop-color="#f5cf68" />
+                  <stop offset="70%" stop-color="#d4af37" />
+                  <stop offset="100%" stop-color="#996515" />
+                </linearGradient>
+                <radialGradient id="ganeshSunburst" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="rgba(255, 245, 210, 0.9)" />
+                  <stop offset="50%" stop-color="rgba(245, 207, 104, 0.45)" />
+                  <stop offset="100%" stop-color="rgba(140, 90, 16, 0)" />
+                </radialGradient>
+              </defs>
+
+              <!-- 24 Divine Radiant Rays -->
+              ${Array.from({ length: 24 }).map((_, i) => {
+                const angle = (i * 15 * Math.PI) / 180;
+                const x2 = 200 + 190 * Math.cos(angle);
+                const y2 = 200 + 190 * Math.sin(angle);
+                return `<line x1="200" y1="200" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="url(#ganeshGoldGrad)" stroke-width="1.2" stroke-dasharray="4 6" opacity="0.6"/>`;
+              }).join('')}
+
+              <!-- Concentric Sacred Circles -->
+              <circle cx="200" cy="200" r="185" fill="none" stroke="url(#ganeshGoldGrad)" stroke-width="2" stroke-dasharray="3 3" opacity="0.7" />
+              <circle cx="200" cy="200" r="170" fill="none" stroke="url(#ganeshGoldGrad)" stroke-width="1.5" />
+              <circle cx="200" cy="200" r="145" fill="none" stroke="url(#ganeshGoldGrad)" stroke-width="2.5" />
+              <circle cx="200" cy="200" r="120" fill="none" stroke="url(#ganeshGoldGrad)" stroke-width="1.5" stroke-dasharray="5 3" />
+              <circle cx="200" cy="200" r="80" fill="none" stroke="url(#ganeshGoldGrad)" stroke-width="2" />
+              <circle cx="200" cy="200" r="60" fill="url(#ganeshSunburst)" stroke="url(#ganeshGoldGrad)" stroke-width="1.5" />
+
+              <!-- 16 Outer Sacred Lotus Petals -->
+              ${Array.from({ length: 16 }).map((_, i) => {
+                const angle = (i * 22.5 * Math.PI) / 180;
+                const x = 200 + 145 * Math.cos(angle);
+                const y = 200 + 145 * Math.sin(angle);
+                const rot = i * 22.5 + 90;
+                return `<path d="M 0,0 C -12,-20 -15,-40 0,-55 C 15,-40 12,-20 0,0 Z" transform="translate(${x.toFixed(1)}, ${y.toFixed(1)}) rotate(${rot.toFixed(1)})" fill="rgba(245, 207, 104, 0.18)" stroke="url(#ganeshGoldGrad)" stroke-width="1.5" />`;
+              }).join('')}
+
+              <!-- 12 Inner Sacred Lotus Petals -->
+              ${Array.from({ length: 12 }).map((_, i) => {
+                const angle = (i * 30 * Math.PI) / 180;
+                const x = 200 + 80 * Math.cos(angle);
+                const y = 200 + 80 * Math.sin(angle);
+                const rot = i * 30 + 90;
+                return `<path d="M 0,0 C -8,-14 -10,-28 0,-38 C 10,-28 8,-14 0,0 Z" transform="translate(${x.toFixed(1)}, ${y.toFixed(1)}) rotate(${rot.toFixed(1)})" fill="rgba(255, 247, 214, 0.28)" stroke="url(#ganeshGoldGrad)" stroke-width="1.5" />`;
+              }).join('')}
+            </svg>
+          </div>
+
+          <picture>
+            <source srcset="/assets/scene-2/s2_ganesh_pedestal.webp" type="image/webp" />
+            <img
+              src="/assets/scene-2/s2_ganesh_pedestal.png"
+              alt="Lord Ganesha"
+              class="scene-2-img scene-2-img--ganesh"
+              loading="eager"
+              decoding="async"
+              width="1366"
+              height="1152"
+              draggable="false"
+            />
+          </picture>
+          <div class="scene-2-pedestal-glow" aria-hidden="true"></div>
+        </div>
       </div>
 
       <!-- Ambient Golden Particles & Drifting Petals Canvas -->
@@ -347,6 +348,8 @@ export function createScene2() {
   `;
 }
 
+let hasRevealedScene2 = false;
+
 // ─── Scene 2 Lifecycle & Interaction ─────────────────────────────────────────
 
 export function initScene2() {
@@ -360,75 +363,92 @@ export function initScene2() {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Scoped GSAP Orchestration for Scene 2
-  gsapCtx = gsap.context(() => {
-    if (!prefersReducedMotion) {
-      const tl = gsap.timeline();
+  if (hasRevealedScene2) {
+    // Already revealed once — maintain stable divine presence without repeating 1.5s intro
+    gsap.set('.scene-2-img--bg, .scene-2-header, .scene-2-img--arch, .scene-2-img--bells, .scene-2-deity-stage, .scene-2-img--diya, .scene-2-plaque', {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      clearProps: 'transform',
+    });
+    gsap.set('.scene-2-halo-wrap', { opacity: 0.8, scale: 1 });
+  } else {
+    gsapCtx = gsap.context(() => {
+      if (!prefersReducedMotion) {
+        const tl = gsap.timeline({
+          onComplete: () => {
+            hasRevealedScene2 = true;
+          },
+        });
 
-      // Natural sequence: Background -> Header -> Arch -> Halo -> Bells -> Deity on Pedestal -> Foreground Diyas -> Sanskrit Plaque
-      tl.fromTo('.scene-2-img--bg',
-        { opacity: 0, scale: 1.05 },
-        { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }
-      )
-      .fromTo('.scene-2-header',
-        { opacity: 0, y: -22 },
-        { opacity: 1, y: 0, duration: 0.85, ease: 'power2.out' },
-        '-=0.85'
-      )
-      .fromTo('.scene-2-img--arch',
-        { opacity: 0, y: -42 },
-        { opacity: 1, y: 0, duration: 1.1, ease: 'power2.out' },
-        '-=0.65'
-      )
-      .fromTo('.scene-2-halo-wrap',
-        { opacity: 0, scale: 0.65 },
-        { opacity: 0.75, scale: 1, duration: 1.0, ease: 'back.out(1.4)' },
-        '-=0.75'
-      )
-      .fromTo('.scene-2-img--bells',
-        { opacity: 0, y: -30 },
-        { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' },
-        '-=0.75'
-      )
-      .fromTo('.scene-2-img--ganesh',
-        { opacity: 0, y: 35, scale: 0.94 },
-        { opacity: 1, y: 0, scale: 1, duration: 1.25, ease: 'power2.out' },
-        '-=0.75'
-      )
-      .fromTo('.scene-2-img--diya',
-        { opacity: 0, y: 22 },
-        { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' },
-        '-=0.85'
-      )
-      .fromTo('.scene-2-plaque',
-        { opacity: 0, y: 24 },
-        { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' },
-        '-=0.6'
-      );
+        // Natural sequence: Background -> Header -> Arch -> Bells -> Foreground Diyas -> Deity Stage (Ganesha + Halo) -> Sanskrit Plaque
+        tl.fromTo('.scene-2-img--bg',
+          { opacity: 0, scale: 1.05 },
+          { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }
+        )
+        .fromTo('.scene-2-header',
+          { opacity: 0, y: -22 },
+          { opacity: 1, y: 0, duration: 0.85, ease: 'power2.out' },
+          '-=0.85'
+        )
+        .fromTo('.scene-2-img--arch',
+          { opacity: 0, y: -42 },
+          { opacity: 1, y: 0, duration: 1.1, ease: 'power2.out' },
+          '-=0.65'
+        )
+        .fromTo('.scene-2-img--bells',
+          { opacity: 0, y: -30 },
+          { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' },
+          '-=0.75'
+        )
+        .fromTo('.scene-2-img--diya',
+          { opacity: 0, y: 22 },
+          { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' },
+          '-=0.75'
+        )
+        .fromTo('.scene-2-deity-stage',
+          { opacity: 0, y: 32, scale: 0.94 },
+          { opacity: 1, y: 0, scale: 1, duration: 1.25, ease: 'power2.out' },
+          '-=0.75'
+        )
+        .fromTo('.scene-2-halo-wrap',
+          { opacity: 0, scale: 0.6 },
+          { opacity: 0.8, scale: 1, duration: 1.0, ease: 'back.out(1.4)' },
+          '-=0.85'
+        )
+        .fromTo('.scene-2-plaque',
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' },
+          '-=0.6'
+        );
+      } else {
+        hasRevealedScene2 = true;
+      }
+    }, '#scene-2');
+  }
 
-      // Interactive Layered Parallax on desktop/tablet
-      const archEl = scene2.querySelector('.scene-2-layer--arch');
-      const ganeshEl = scene2.querySelector('.scene-2-img--ganesh');
-      const bellsEl = scene2.querySelector('.scene-2-img--bells');
-      const diyaEl = scene2.querySelector('.scene-2-img--diya');
+  // Interactive Layered Parallax on desktop/tablet
+  const archEl = scene2.querySelector('.scene-2-layer--arch');
+  const deityEl = scene2.querySelector('.scene-2-deity-stage');
+  const bellsEl = scene2.querySelector('.scene-2-img--bells');
+  const diyaEl = scene2.querySelector('.scene-2-img--diya');
 
-      const quickArchX = archEl ? gsap.quickTo(archEl, 'x', { duration: 0.8, ease: 'power1.out' }) : null;
-      const quickGaneshX = ganeshEl ? gsap.quickTo(ganeshEl, 'x', { duration: 0.9, ease: 'power1.out' }) : null;
-      const quickBellsX = bellsEl ? gsap.quickTo(bellsEl, 'x', { duration: 0.7, ease: 'power1.out' }) : null;
-      const quickDiyaX = diyaEl ? gsap.quickTo(diyaEl, 'x', { duration: 0.6, ease: 'power1.out' }) : null;
+  const quickArchX = archEl ? gsap.quickTo(archEl, 'x', { duration: 0.8, ease: 'power1.out' }) : null;
+  const quickDeityX = deityEl ? gsap.quickTo(deityEl, 'x', { duration: 0.9, ease: 'power1.out' }) : null;
+  const quickBellsX = bellsEl ? gsap.quickTo(bellsEl, 'x', { duration: 0.7, ease: 'power1.out' }) : null;
+  const quickDiyaX = diyaEl ? gsap.quickTo(diyaEl, 'x', { duration: 0.6, ease: 'power1.out' }) : null;
 
-      parallaxMoveHandler = (e) => {
-        const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : window.innerWidth / 2);
-        const normX = (clientX / window.innerWidth) * 2 - 1;
+  parallaxMoveHandler = (e) => {
+    const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : window.innerWidth / 2);
+    const normX = (clientX / window.innerWidth) * 2 - 1;
 
-        if (quickArchX) quickArchX(normX * 8);
-        if (quickGaneshX) quickGaneshX(normX * 14);
-        if (quickBellsX) quickBellsX(normX * 18);
-        if (quickDiyaX) quickDiyaX(normX * 22);
-      };
+    if (quickArchX) quickArchX(normX * 8);
+    if (quickDeityX) quickDeityX(normX * 14);
+    if (quickBellsX) quickBellsX(normX * 18);
+    if (quickDiyaX) quickDiyaX(normX * 22);
+  };
 
-      window.addEventListener('mousemove', parallaxMoveHandler, { passive: true });
-    }
-  }, '#scene-2');
+  window.addEventListener('mousemove', parallaxMoveHandler, { passive: true });
 
   // Fade out incoming golden light bloom
   const bloom = scene2.querySelector('.scene-2-golden-bloom');
@@ -460,18 +480,20 @@ export function initScene2() {
   // Handle scroll or click hint to progress to Scene 3
   const scrollHint = scene2.querySelector('.scene-2-scroll-hint');
   const handleProceed = () => {
+    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
     if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-      window.sceneManager.goToScene(3);
+      window.sceneManager.goToScene(3, 'down');
     } else {
-      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3 } }));
+      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3, direction: 'down' } }));
     }
   };
 
   const handleBack = () => {
+    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
     if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-      window.sceneManager.goToScene(1);
+      window.sceneManager.goToScene(1, 'up');
     } else {
-      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 1 } }));
+      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 1, direction: 'up' } }));
     }
   };
 
@@ -485,43 +507,63 @@ export function initScene2() {
     });
   }
 
-  // Bidirectional mousewheel navigation (Scroll Down -> Scene 3, Scroll Up -> Scene 1)
-  let scrollTimeout = null;
+  // Bidirectional mousewheel navigation with velocity accumulation (Scroll Down -> Scene 3, Scroll Up -> Scene 1)
+  let wheelAccumulator = 0;
+  let wheelResetTimer = null;
+
   const handleWheel = (e) => {
-    if (e.deltaY > 30) {
-      if (!scrollTimeout) {
-        scrollTimeout = setTimeout(() => {
-          handleProceed();
-          scrollTimeout = null;
-        }, 150);
-      }
-    } else if (e.deltaY < -30) {
-      if (!scrollTimeout) {
-        scrollTimeout = setTimeout(() => {
-          handleBack();
-          scrollTimeout = null;
-        }, 150);
-      }
+    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
+
+    wheelAccumulator += e.deltaY;
+
+    if (wheelResetTimer) clearTimeout(wheelResetTimer);
+    wheelResetTimer = setTimeout(() => {
+      wheelAccumulator = 0;
+    }, 200);
+
+    // Intentional scroll down -> Scene 3 (Threshold: 55px)
+    if (wheelAccumulator >= 55) {
+      wheelAccumulator = 0;
+      handleProceed();
+    }
+    // Intentional scroll up -> Scene 1 (Threshold: -55px)
+    else if (wheelAccumulator <= -55) {
+      wheelAccumulator = 0;
+      handleBack();
     }
   };
+
   window.addEventListener('wheel', handleWheel, { passive: true });
   window._scene2WheelHandler = handleWheel;
 
   // Touch Swipe (Swipe Up -> Scene 3, Swipe Down -> Scene 1)
   let touchStartY = 0;
+  let touchStartX = 0;
+
   window._scene2TouchStartHandler = (e) => {
-    if (e.touches && e.touches.length > 0) touchStartY = e.touches[0].clientY;
+    if (e.touches && e.touches.length > 0) {
+      touchStartY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
+    }
   };
+
   window._scene2TouchEndHandler = (e) => {
+    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
     if (e.changedTouches && e.changedTouches.length > 0) {
       const deltaY = touchStartY - e.changedTouches[0].clientY;
-      if (deltaY > 50) {
-        handleProceed();
-      } else if (deltaY < -50) {
-        handleBack();
+      const deltaX = Math.abs(touchStartX - e.changedTouches[0].clientX);
+
+      // Verify dominant vertical gesture
+      if (Math.abs(deltaY) > deltaX && Math.abs(deltaY) > 50) {
+        if (deltaY > 50) {
+          handleProceed();
+        } else if (deltaY < -50) {
+          handleBack();
+        }
       }
     }
   };
+
   window.addEventListener('touchstart', window._scene2TouchStartHandler, { passive: true });
   window.addEventListener('touchend', window._scene2TouchEndHandler, { passive: true });
 }
@@ -536,11 +578,6 @@ export function destroyScene2() {
     parallaxMoveHandler = null;
   }
 
-  if (gsapCtx) {
-    gsapCtx.revert();
-    gsapCtx = null;
-  }
-
   if (window._scene2WheelHandler) {
     window.removeEventListener('wheel', window._scene2WheelHandler);
     window._scene2WheelHandler = null;
@@ -553,4 +590,6 @@ export function destroyScene2() {
     window.removeEventListener('touchend', window._scene2TouchEndHandler);
     window._scene2TouchEndHandler = null;
   }
+
+  // Keep DOM elements rendered and intact for instant zero-jank return navigation
 }

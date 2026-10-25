@@ -347,80 +347,86 @@ export function createScene3() {
   `;
 }
 
+let hasRevealedScene3 = false;
+let scene3ResizeHandler = null;
+
 // ─── Scene 3 Lifecycle & Interaction ─────────────────────────────────────────
 
 export function initScene3() {
   clearAllTimers();
-  isTransitioning = false;
 
   const scene3 = document.getElementById('scene-3');
   if (!scene3) return;
 
-  scene3.classList.remove('curtains-open', 'card-revealed');
-  scene3.classList.add('active');
-
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Scoped GSAP Orchestration for Scene 3
-  if (gsapCtx) {
-    gsapCtx.revert();
-    gsapCtx = null;
-  }
+  if (hasRevealedScene3) {
+    // Curtains have already opened; keep them gracefully parted
+    scene3.classList.add('curtains-open', 'card-revealed');
+    gsap.set('.scene-3-curtains', { display: 'none' });
+    gsap.set('.scene-3-card-container', { opacity: 1, y: 0, scale: 1 });
+    gsap.set('.scene-3-peacocks-wrap', { opacity: 1, scale: 1, y: 0 });
+    gsap.set('.scene-3-fade-item', { opacity: 1, y: 0 });
+  } else {
+    // First time entering Scene 3
+    scene3.classList.remove('curtains-open', 'card-revealed');
+    gsap.set('.scene-3-curtains', { display: 'block' });
+    gsap.set('.scene-3-curtain-panel--left', { xPercent: 0 });
+    gsap.set('.scene-3-curtain-panel--right', { xPercent: 0 });
+    gsap.set('.scene-3-curtain-crevice', { opacity: 1 });
 
-  gsapCtx = gsap.context(() => {
-    if (prefersReducedMotion) {
-      scene3.classList.add('curtains-open', 'card-revealed');
-      gsap.set('.scene-3-curtains', { display: 'none' });
-      gsap.set('.scene-3-card-container', { opacity: 1, y: 0, scale: 1 });
-      gsap.set('.scene-3-peacocks-wrap', { opacity: 1, scale: 1, y: 0 });
-      gsap.set('.scene-3-fade-item', { opacity: 1, y: 0 });
-      return;
-    }
-
-    const tl = gsap.timeline({
-      onComplete: () => {
+    gsapCtx = gsap.context(() => {
+      if (prefersReducedMotion) {
         scene3.classList.add('curtains-open', 'card-revealed');
-      },
-    });
+        gsap.set('.scene-3-curtains', { display: 'none' });
+        gsap.set('.scene-3-card-container', { opacity: 1, y: 0, scale: 1 });
+        gsap.set('.scene-3-peacocks-wrap', { opacity: 1, scale: 1, y: 0 });
+        gsap.set('.scene-3-fade-item', { opacity: 1, y: 0 });
+        hasRevealedScene3 = true;
+        return;
+      }
 
-    // 1. Instantly hide crevice as curtains start parting
-    tl.to('.scene-3-curtain-crevice', {
-      opacity: 0,
-      duration: 0.35,
-      ease: 'power2.out',
-    }, 0.1)
-    // 2. Part the closed curtains completely off-screen (-105% / +105%)
-    .to('.scene-3-curtain-panel--left', {
-      xPercent: -105,
-      duration: 1.4,
-      ease: 'power2.inOut',
-    }, 0.15)
-    .to('.scene-3-curtain-panel--right', {
-      xPercent: 105,
-      duration: 1.4,
-      ease: 'power2.inOut',
-    }, 0.15)
-    // Hide curtain container when done so it never blocks or overlaps
-    .set('.scene-3-curtains', { display: 'none' })
-    // 3. Peacocks reveal smoothly
-    .fromTo('.scene-3-peacocks-wrap',
-      { opacity: 0, scale: 0.94, y: 15 },
-      { opacity: 1, scale: 1, y: 0, duration: 1, ease: 'power2.out' },
-      0.4
-    )
-    // 4. Grand Invitation Scroll Card enters with restrained elegance
-    .fromTo('.scene-3-card-container',
-      { opacity: 0, y: 28, scale: 0.94 },
-      { opacity: 1, y: 0, scale: 1, duration: 1, ease: 'power2.out' },
-      0.55
-    )
-    // 5. Staggered reveal of internal card typography & elements
-    .fromTo('.scene-3-fade-item',
-      { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out' },
-      0.85
-    );
-  }, scene3);
+      const tl = gsap.timeline({
+        onComplete: () => {
+          scene3.classList.add('curtains-open', 'card-revealed');
+          hasRevealedScene3 = true;
+        },
+      });
+
+      // Part the velvet curtains gracefully
+      tl.to('.scene-3-curtain-crevice', {
+        opacity: 0,
+        duration: 0.35,
+        ease: 'power2.out',
+      }, 0.05)
+      .to('.scene-3-curtain-panel--left', {
+        xPercent: -105,
+        duration: 1.25,
+        ease: 'power2.inOut',
+      }, 0.1)
+      .to('.scene-3-curtain-panel--right', {
+        xPercent: 105,
+        duration: 1.25,
+        ease: 'power2.inOut',
+      }, 0.1)
+      .set('.scene-3-curtains', { display: 'none' })
+      .fromTo('.scene-3-peacocks-wrap',
+        { opacity: 0, scale: 0.94, y: 15 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.9, ease: 'power2.out' },
+        0.35
+      )
+      .fromTo('.scene-3-card-container',
+        { opacity: 0, y: 24, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.95, ease: 'power2.out' },
+        0.45
+      )
+      .fromTo('.scene-3-fade-item',
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.55, stagger: 0.07, ease: 'power2.out' },
+        0.75
+      );
+    }, scene3);
+  }
 
   // Dissolve incoming golden bloom smoothly
   const bloom = scene3.querySelector('.scene-3-incoming-bloom');
@@ -448,46 +454,33 @@ export function initScene3() {
       animationLoop();
     }
 
-    const handleResize = () => {
+    scene3ResizeHandler = () => {
       if (canvas) {
         particleCtx = resizeCanvas(canvas);
         initParticles(canvas);
       }
     };
-    window.addEventListener('resize', handleResize, { passive: true });
-    activeTimers.push(handleResize);
+    window.addEventListener('resize', scene3ResizeHandler, { passive: true });
   }
 
   // Handle Handoff to Scene 4
   const proceedToScene4 = () => {
-    if (isTransitioning) return;
-    isTransitioning = true;
-
+    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
     if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-      window.sceneManager.goToScene(4);
+      window.sceneManager.goToScene(4, 'down');
     } else {
-      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 4 } }));
+      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 4, direction: 'down' } }));
     }
-
-    addSafeTimer(() => {
-      isTransitioning = false;
-    }, 1500);
   };
 
   // Handle Return to Scene 2
   const proceedToScene2 = () => {
-    if (isTransitioning) return;
-    isTransitioning = true;
-
+    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
     if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-      window.sceneManager.goToScene(2);
+      window.sceneManager.goToScene(2, 'up');
     } else {
-      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 2 } }));
+      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 2, direction: 'up' } }));
     }
-
-    addSafeTimer(() => {
-      isTransitioning = false;
-    }, 1500);
   };
 
   const nextBtn = document.getElementById('scene-3-next-btn');
@@ -501,52 +494,88 @@ export function initScene3() {
     });
   }
 
-  // Support mousewheel scroll (Scroll Down -> Scene 4, Scroll Up -> Scene 2)
-  let wheelTimeout = null;
-  window._scene3WheelHandler = (e) => {
-    if (isTransitioning) return;
-    const card = scene3.querySelector('.scene-3-card');
-    const isAtBottom = card ? card.scrollTop + card.clientHeight >= card.scrollHeight - 25 : true;
-    const isAtTop = card ? card.scrollTop <= 10 : true;
+  // Support mousewheel scroll with card overscroll safety buffer
+  let cardOverscrollY = 0;
+  let overscrollResetTimer = null;
 
-    if (e.deltaY > 35 && isAtBottom) {
-      if (!wheelTimeout) {
-        wheelTimeout = setTimeout(() => {
-          proceedToScene4();
-          wheelTimeout = null;
-        }, 150);
+  window._scene3WheelHandler = (e) => {
+    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
+
+    const card = scene3.querySelector('.scene-3-card');
+    if (!card) return;
+
+    const isScrollable = card.scrollHeight > card.clientHeight + 15;
+    const isAtBottom = isScrollable
+      ? card.scrollTop + card.clientHeight >= card.scrollHeight - 12
+      : true;
+    const isAtTop = isScrollable
+      ? card.scrollTop <= 6
+      : true;
+
+    // If card is scrollable and scrolling within content, permit natural internal scroll
+    if (isScrollable) {
+      if ((e.deltaY > 0 && !isAtBottom) || (e.deltaY < 0 && !isAtTop)) {
+        cardOverscrollY = 0;
+        return;
       }
-    } else if (e.deltaY < -35 && isAtTop) {
-      if (!wheelTimeout) {
-        wheelTimeout = setTimeout(() => {
-          proceedToScene2();
-          wheelTimeout = null;
-        }, 150);
-      }
+    }
+
+    cardOverscrollY += e.deltaY;
+
+    if (overscrollResetTimer) clearTimeout(overscrollResetTimer);
+    overscrollResetTimer = setTimeout(() => {
+      cardOverscrollY = 0;
+    }, 220);
+
+    // Scroll Down -> Scene 4 (require deliberate overscroll: 60px)
+    if (e.deltaY > 0 && isAtBottom && cardOverscrollY >= 60) {
+      cardOverscrollY = 0;
+      proceedToScene4();
+    }
+    // Scroll Up -> Scene 2 (require deliberate overscroll: -60px)
+    else if (e.deltaY < 0 && isAtTop && cardOverscrollY <= -60) {
+      cardOverscrollY = 0;
+      proceedToScene2();
     }
   };
   window.addEventListener('wheel', window._scene3WheelHandler, { passive: true });
 
-  // Support mobile touch swipe (Swipe Up -> Scene 4, Swipe Down -> Scene 2)
+  // Support mobile touch swipe with internal card scroll awareness
   let touchStartY = 0;
+  let touchStartX = 0;
+
   window._scene3TouchStartHandler = (e) => {
     if (e.touches && e.touches.length > 0) {
       touchStartY = e.touches[0].clientY;
+      touchStartX = e.touches[0].clientX;
     }
   };
+
   window._scene3TouchEndHandler = (e) => {
-    if (e.changedTouches && e.changedTouches.length > 0 && !isTransitioning) {
+    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
+    if (e.changedTouches && e.changedTouches.length > 0) {
       const deltaY = touchStartY - e.changedTouches[0].clientY;
+      const deltaX = Math.abs(touchStartX - e.changedTouches[0].clientX);
+
+      if (Math.abs(deltaY) < deltaX || Math.abs(deltaY) < 55) return;
+
       const card = scene3.querySelector('.scene-3-card');
-      const isAtBottom = card ? card.scrollTop + card.clientHeight >= card.scrollHeight - 25 : true;
-      const isAtTop = card ? card.scrollTop <= 10 : true;
-      if (deltaY > 60 && isAtBottom) {
+      const isScrollable = card ? card.scrollHeight > card.clientHeight + 15 : false;
+      const isAtBottom = card && isScrollable
+        ? card.scrollTop + card.clientHeight >= card.scrollHeight - 12
+        : true;
+      const isAtTop = card && isScrollable
+        ? card.scrollTop <= 6
+        : true;
+
+      if (deltaY > 55 && isAtBottom) {
         proceedToScene4();
-      } else if (deltaY < -60 && isAtTop) {
+      } else if (deltaY < -55 && isAtTop) {
         proceedToScene2();
       }
     }
   };
+
   window.addEventListener('touchstart', window._scene3TouchStartHandler, { passive: true });
   window.addEventListener('touchend', window._scene3TouchEndHandler, { passive: true });
 }
@@ -555,7 +584,6 @@ export function destroyScene3() {
   clearAllTimers();
   cancelAnimationFrame(particleAnimFrame);
   ambientParticles = [];
-  isTransitioning = false;
 
   if (window._scene3WheelHandler) {
     window.removeEventListener('wheel', window._scene3WheelHandler);
@@ -569,14 +597,10 @@ export function destroyScene3() {
     window.removeEventListener('touchend', window._scene3TouchEndHandler);
     window._scene3TouchEndHandler = null;
   }
-
-  if (gsapCtx) {
-    gsapCtx.revert();
-    gsapCtx = null;
+  if (scene3ResizeHandler) {
+    window.removeEventListener('resize', scene3ResizeHandler);
+    scene3ResizeHandler = null;
   }
 
-  const scene3 = document.getElementById('scene-3');
-  if (scene3) {
-    scene3.classList.remove('curtains-open', 'card-revealed');
-  }
+  // Keep curtains and elements revealed so returning backwards is instant and clean
 }
