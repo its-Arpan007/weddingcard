@@ -30,6 +30,7 @@ export const WEDDING_EVENTS = [
     name: 'Tilak',
     date: '27 November 2026',
     dateISO: '2026-11-27',
+    time: { start: '18:00', end: '22:00', display: '6:00 PM onwards' },
     venue: 'Swarna Bhobon',
     venueAddress: 'Swarna Bhobon',
     mapUrl: 'https://maps.app.goo.gl/oKkuRcKUejScfrzj8',
@@ -39,13 +40,18 @@ export const WEDDING_EVENTS = [
   {
     id: 'matkor',
     badge: 'Traditional Ritual',
-    name: 'Matkor',
+    name: 'Mati Matkor & Haldi',
     date: '28 November 2026',
     dateISO: '2026-11-28',
+    time: {
+      start: '16:30',
+      end: '22:00',
+      display: '4:30 PM onwards for Mati Matkor & 7:30 PM onwards for Haldi',
+    },
     venue: 'At home',
     venueAddress: 'At home',
     mapUrl: 'https://maps.app.goo.gl/yXkeEQSZUPhdMXee7',
-    mapLabel: 'View location of Matkor ceremony At home on Google Maps',
+    mapLabel: 'View location of Mati Matkor & Haldi ceremony At home on Google Maps',
     icon: '🪔',
   },
   {
@@ -104,7 +110,7 @@ function addSafeTimer(fn, delay) {
 function clearAllTimers() {
   activeTimers.forEach((item) => {
     if (typeof item === 'function') {
-      try { item(); } catch {}
+      try { item(); } catch { }
     } else {
       clearTimeout(item);
     }
@@ -742,7 +748,6 @@ export function initScene4() {
   let wheelTimer = null;
   const wheelHandler = (e) => {
     if (isTransitioning) return;
-    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
     const scrollContainer = scene4.querySelector('.scene-4-scroll-container');
     const isAtBottom = scrollContainer
       ? scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 25
@@ -753,9 +758,9 @@ export function initScene4() {
       if (!wheelTimer) {
         wheelTimer = setTimeout(() => {
           if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-            window.sceneManager.goToScene(5, 'down');
+            window.sceneManager.goToScene(5);
           } else {
-            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5, direction: 'down' } }));
+            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5 } }));
           }
           wheelTimer = null;
         }, 150);
@@ -764,9 +769,9 @@ export function initScene4() {
       if (!wheelTimer) {
         wheelTimer = setTimeout(() => {
           if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-            window.sceneManager.goToScene(3, 'up');
+            window.sceneManager.goToScene(3);
           } else {
-            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3, direction: 'up' } }));
+            window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3 } }));
           }
           wheelTimer = null;
         }, 150);
@@ -780,9 +785,7 @@ export function initScene4() {
     if (e.touches && e.touches.length > 0) touchStartY = e.touches[0].clientY;
   };
   const touchEndHandler = (e) => {
-    if (isTransitioning) return;
-    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
-    if (e.changedTouches && e.changedTouches.length > 0) {
+    if (e.changedTouches && e.changedTouches.length > 0 && !isTransitioning) {
       const deltaY = touchStartY - e.changedTouches[0].clientY;
       const scrollContainer = scene4.querySelector('.scene-4-scroll-container');
       const isAtBottom = scrollContainer
@@ -792,15 +795,15 @@ export function initScene4() {
 
       if (deltaY > 60 && isAtBottom) {
         if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-          window.sceneManager.goToScene(5, 'down');
+          window.sceneManager.goToScene(5);
         } else {
-          window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5, direction: 'down' } }));
+          window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 5 } }));
         }
       } else if (deltaY < -60 && isAtTop) {
         if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-          window.sceneManager.goToScene(3, 'up');
+          window.sceneManager.goToScene(3);
         } else {
-          window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3, direction: 'up' } }));
+          window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 3 } }));
         }
       }
     }

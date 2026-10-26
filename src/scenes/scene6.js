@@ -471,22 +471,22 @@ export function createScene6() {
                 <span>🕕 6:00 PM Onwards</span>
               </div>
               <p class="timeline-desc">Sacred acceptance, family blessing exchange, traditional shagun rituals and dinner.</p>
-              <div class="timeline-venue">📍 Shree Krishna Palace, Kanchrapara</div>
+              <div class="timeline-venue">📍 Swarna Bhobon</div>
             </div>
           </div>
 
-          <!-- Day 2: Matkor & Haldi -->
+          <!-- Day 2: Mati Matkor & Haldi -->
           <div class="scene-6-timeline-item">
             <div class="timeline-dot"></div>
             <div class="timeline-content">
               <span class="timeline-tag">DAY 2 • SACRED TRADITIONS</span>
-              <h4 class="timeline-item-title">Matkor, Haldi &amp; Sangeet</h4>
+              <h4 class="timeline-item-title">Mati Matkor &amp; Haldi</h4>
               <div class="timeline-meta">
                 <span>📅 Saturday, 28 November 2026</span>
-                <span>🕙 10:00 AM (Matkor) • 6:30 PM (Sangeet)</span>
+                <span>🕓 4:30 PM Onwards for Mati Matkor &amp; 7:30 PM Onwards for Haldi</span>
               </div>
-              <p class="timeline-desc">Earthen soil prayer (Matkor Puja), holy turmeric bath (Haldi), followed by musical gala &amp; folk dances.</p>
-              <div class="timeline-venue">📍 Prasad Family Courtyard, Kanchrapara</div>
+              <p class="timeline-desc">Earthen soil prayer (Matkor Puja), holy turmeric bath (Haldi)</p>
+              <div class="timeline-venue">📍 In House, Kanchrapara</div>
             </div>
           </div>
 
@@ -495,7 +495,7 @@ export function createScene6() {
             <div class="timeline-dot"></div>
             <div class="timeline-content">
               <span class="timeline-tag">DAY 3 • THE WEDDING DAY</span>
-              <h4 class="timeline-item-title">The Grand Vivah &amp; Reception</h4>
+              <h4 class="timeline-item-title">The Grand Vivah</h4>
               <div class="timeline-meta">
                 <span>📅 Sunday, 29 November 2026</span>
                 <span>🕖 Auspicious Muhurat 7:00 PM Onwards</span>
@@ -508,7 +508,7 @@ export function createScene6() {
 
         <div class="scene-6-modal-footer">
           <button id="scene6-modal-goto-events" class="scene-6-modal-btn" type="button">
-            View Complete Event Gallery (Scene 4) →
+            View Complete Event Gallery →
           </button>
         </div>
       </div>
@@ -656,17 +656,10 @@ export function initScene6() {
   if (replayBtn) {
     replayBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      gsap.to(scene6, {
-        opacity: 0.5,
-        scale: 0.98,
-        duration: 0.4,
-        ease: 'power2.inOut',
-        onComplete: () => {
-          if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-            window.sceneManager.goToScene(1, 'up');
-          }
-        },
-      });
+      closeTimelineModal();
+      if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
+        window.sceneManager.goToScene(1, 'up');
+      }
     });
   }
 
@@ -738,6 +731,11 @@ export function destroyScene6() {
   if (gsapCtx) {
     gsapCtx.revert();
     gsapCtx = null;
+  }
+
+  const scene6 = document.getElementById('scene-6');
+  if (scene6) {
+    gsap.set(scene6, { clearProps: 'opacity,scale,transform' });
   }
 
   ambientParticles = [];

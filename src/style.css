@@ -40,7 +40,7 @@ body {
   overflow: hidden;
 }
 
-/* Scene container base — Cinematic Zero-Jank Transitions */
+/* Scene container base */
 .scene {
   position: absolute;
   inset: 0;
@@ -48,60 +48,20 @@ body {
   height: 100%;
   overflow: hidden;
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
-  transform: translate3d(0, 0, 0);
-  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-              visibility 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform, opacity;
-  backface-visibility: hidden;
+  transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: opacity;
+  transform: translateZ(0);
 }
 
 .scene.active {
-  opacity: 1 !important;
-  visibility: visible !important;
-  pointer-events: auto !important;
-  transform: translate3d(0, 0, 0) scale(1) !important;
-  z-index: 10 !important;
-}
-
-/* Forward transition: Outgoing rises gently, Incoming climbs up smoothly */
-.scene.exit-up {
-  opacity: 0 !important;
-  visibility: visible !important;
-  pointer-events: none !important;
-  transform: translate3d(0, -7%, 0) scale(0.98) !important;
-  z-index: 5 !important;
-}
-
-.scene.enter-from-down {
-  opacity: 0 !important;
-  visibility: visible !important;
-  pointer-events: none !important;
-  transform: translate3d(0, 9%, 0) scale(0.99) !important;
-  z-index: 10 !important;
-}
-
-/* Backward transition: Outgoing descends gently, Incoming drops in smoothly */
-.scene.exit-down {
-  opacity: 0 !important;
-  visibility: visible !important;
-  pointer-events: none !important;
-  transform: translate3d(0, 7%, 0) scale(0.98) !important;
-  z-index: 5 !important;
-}
-
-.scene.enter-from-up {
-  opacity: 0 !important;
-  visibility: visible !important;
-  pointer-events: none !important;
-  transform: translate3d(0, -9%, 0) scale(0.99) !important;
-  z-index: 10 !important;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* Utility: reduced motion */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

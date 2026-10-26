@@ -13,7 +13,16 @@
   height: 100dvh;
   overflow: hidden;
   background-color: #1a0408;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  transition: opacity 0.4s ease-out;
   font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.scene-5.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* ─── Layer 1: Palace Sunset Courtyard Background ─────────────────────────── */
@@ -47,12 +56,10 @@
 .scene-5-bg-vignette {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    ellipse at 50% 35%,
-    rgba(25, 4, 8, 0.35) 0%,
-    rgba(32, 6, 12, 0.72) 65%,
-    rgba(18, 3, 6, 0.94) 100%
-  );
+  background: radial-gradient(ellipse at 50% 35%,
+      rgba(25, 4, 8, 0.35) 0%,
+      rgba(32, 6, 12, 0.72) 65%,
+      rgba(18, 3, 6, 0.94) 100%);
   pointer-events: none;
 }
 
@@ -96,12 +103,10 @@
   transform: translateX(-50%);
   width: 320px;
   height: 160px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255, 175, 55, 0.38) 0%,
-    rgba(215, 125, 20, 0.15) 50%,
-    transparent 75%
-  );
+  background: radial-gradient(ellipse at center,
+      rgba(255, 175, 55, 0.38) 0%,
+      rgba(215, 125, 20, 0.15) 50%,
+      transparent 75%);
   filter: blur(24px);
   pointer-events: none;
 }
@@ -417,8 +422,15 @@
 }
 
 @keyframes knotGlow {
-  0% { box-shadow: 0 0 12px rgba(245, 207, 104, 0.35); transform: scale(0.96); }
-  100% { box-shadow: 0 0 22px rgba(245, 207, 104, 0.7); transform: scale(1.04); }
+  0% {
+    box-shadow: 0 0 12px rgba(245, 207, 104, 0.35);
+    transform: scale(0.96);
+  }
+
+  100% {
+    box-shadow: 0 0 22px rgba(245, 207, 104, 0.7);
+    transform: scale(1.04);
+  }
 }
 
 .scene-5-knot-glyph {
@@ -554,8 +566,15 @@
 }
 
 @keyframes floatArrowS5 {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(3px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(3px);
+  }
 }
 
 .scene-5-scroll-hint {
@@ -648,6 +667,7 @@
 /* ─── Reduced Motion Accessibility ────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
+
   .scene-5-bg-img,
   .scene-5-arch-img,
   .scene-5-incoming-bloom,

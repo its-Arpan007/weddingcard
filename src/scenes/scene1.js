@@ -285,10 +285,12 @@ function returnToEnvelopeStage() {
   if (titleStage) {
     titleStage.classList.remove('active');
     titleStage.setAttribute('aria-hidden', 'true');
+    gsap.to(titleStage, { opacity: 0, duration: 0.4, ease: 'power2.out' });
   }
 
   if (envelopeStage) {
     envelopeStage.classList.remove('fading');
+    gsap.to(envelopeStage, { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' });
   }
 }
 
@@ -542,7 +544,7 @@ export function createScene1() {
                   <p class="card-occasion-title">Royal Wedding Invitation</p>
                   <h1 class="card-couple-names">Sneha &amp; Dipak</h1>
                   <p class="card-subtitle-msg">
-                    Cordially invite you to grace the auspicious celebration of their union
+                    Cordially invite you and your family to grace the auspicious celebration of their union
                   </p>
                 </div>
 
@@ -864,15 +866,120 @@ export function createScene1() {
   `;
 }
 
-// ─── Scene 1 Initialization & Lifecycle ──────────────────────────────────────
+// ─── Scene 1 State Reset ─────────────────────────────────────────────────────
 
-export function initScene1() {
+export function resetScene1State() {
   clearAllTimers();
   isOpen = false;
   inTitleStage = false;
   isTransitioning = false;
-  isDestroyed = false;
   burstParticles = [];
+
+  const envelopeStage = document.getElementById('scene-1-envelope-stage');
+  const envelopeRig = document.getElementById('envelope-float-rig');
+  const sealBtn = document.getElementById('seal-assembly');
+  const topFlap = document.querySelector('.flap-top-hinge');
+  const card = document.querySelector('.invitation-card-3d');
+  const hintPill = document.getElementById('envelope-hint');
+  const titleStage = document.getElementById('wedding-title-stage');
+  const flare = document.getElementById('scene1-flare');
+
+  // 1. Reset Envelope Stage
+  if (envelopeStage) {
+    envelopeStage.classList.remove('fading');
+    gsap.set(envelopeStage, { clearProps: 'all' });
+    envelopeStage.style.opacity = '1';
+    envelopeStage.style.transform = '';
+    envelopeStage.style.pointerEvents = 'auto';
+  }
+
+  // 2. Reset Envelope Rig
+  if (envelopeRig) {
+    envelopeRig.classList.remove('envelope-open');
+    envelopeRig.style.transform = '';
+    const specularOverlay = envelopeRig.querySelector('.gold-specular-overlay');
+    if (specularOverlay) {
+      specularOverlay.style.setProperty('--shimmer-x', '50%');
+      specularOverlay.style.setProperty('--shimmer-y', '50%');
+    }
+  }
+
+  // 3. Reset Wax Seal Assembly
+  if (sealBtn) {
+    gsap.set(sealBtn, { clearProps: 'all' });
+    sealBtn.style.transform = '';
+    sealBtn.style.opacity = '1';
+    sealBtn.style.display = 'block';
+    sealBtn.style.pointerEvents = 'auto';
+  }
+
+  // 4. Reset Top Flap Hinge
+  if (topFlap) {
+    gsap.set(topFlap, { clearProps: 'all' });
+    topFlap.style.transform = '';
+  }
+
+  // 5. Reset 3D Invitation Card
+  if (card) {
+    gsap.set(card, { clearProps: 'all' });
+    card.style.transform = '';
+  }
+
+  // 6. Reset Envelope Hint Pill
+  if (hintPill) {
+    gsap.set(hintPill, { clearProps: 'all' });
+    hintPill.style.opacity = '1';
+    hintPill.style.transform = '';
+    hintPill.style.pointerEvents = 'auto';
+  }
+
+  // 7. Reset Title Stage & all children
+  if (titleStage) {
+    titleStage.classList.remove('active', 'transitioning-out', 'fading-out');
+    titleStage.setAttribute('aria-hidden', 'true');
+    gsap.set(titleStage, { clearProps: 'all' });
+    titleStage.style.opacity = '0';
+    titleStage.style.pointerEvents = 'none';
+
+    const titleCard = titleStage.querySelector('.wedding-title-card');
+    if (titleCard) {
+      titleCard.classList.remove('fading-out');
+      gsap.set(titleCard, { clearProps: 'all' });
+    }
+
+    const titleChildren = titleStage.querySelectorAll(
+      '.wedding-title-badge, .wedding-title-divider, .wedding-title-main, .wedding-title-sub, .wedding-title-lotus'
+    );
+    titleChildren.forEach((el) => {
+      gsap.set(el, { clearProps: 'all' });
+    });
+  }
+
+  // 8. Reset Flare
+  if (flare) {
+    flare.classList.remove('radiate');
+    gsap.set(flare, { clearProps: 'all' });
+  }
+}
+
+// ─── Scene 1 Initialization & Lifecycle ──────────────────────────────────────
+
+export function initScene1() {
+  if (cleanupListeners) {
+    cleanupListeners();
+    cleanupListeners = null;
+  }
+  if (animFrameId) {
+    cancelAnimationFrame(animFrameId);
+    animFrameId = 0;
+  }
+  if (gsapCtx) {
+    gsapCtx.revert();
+    gsapCtx = null;
+  }
+
+  isDestroyed = false;
+  resetScene1State();
 
   const envelopeRig = document.getElementById('envelope-float-rig');
   const sealBtn = document.getElementById('seal-assembly');
@@ -1154,6 +1261,12 @@ export function initScene1() {
     }, 2600);
   };
 
+  const handleTitleClick = (e) => {
+    if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+    if (e.type === 'keydown') e.preventDefault();
+    proceedToScene2();
+  };
+
   if (sealBtn) {
     sealBtn.addEventListener('click', handleEnvelopeClick);
     sealBtn.addEventListener('keydown', handleEnvelopeClick);
@@ -1164,11 +1277,6 @@ export function initScene1() {
 
   // Title Stage click / tap / keyboard to advance immediately
   if (titleStage) {
-    const handleTitleClick = (e) => {
-      if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
-      if (e.type === 'keydown') e.preventDefault();
-      proceedToScene2();
-    };
     titleStage.addEventListener('click', handleTitleClick);
     titleStage.addEventListener('keydown', handleTitleClick);
   }
@@ -1220,6 +1328,19 @@ export function initScene1() {
     window.removeEventListener('wheel', handleWheel);
     window.removeEventListener('touchstart', onTouchStart);
     window.removeEventListener('touchend', onTouchEnd);
+
+    if (sealBtn) {
+      sealBtn.removeEventListener('click', handleEnvelopeClick);
+      sealBtn.removeEventListener('keydown', handleEnvelopeClick);
+    }
+    if (envelopeRig) {
+      envelopeRig.removeEventListener('click', handleEnvelopeClick);
+      envelopeRig.removeEventListener('keydown', handleEnvelopeClick);
+    }
+    if (titleStage) {
+      titleStage.removeEventListener('click', handleTitleClick);
+      titleStage.removeEventListener('keydown', handleTitleClick);
+    }
   };
 }
 
@@ -1244,7 +1365,5 @@ export function destroyScene1() {
     gsapCtx.revert();
     gsapCtx = null;
   }
-  isOpen = false;
-  inTitleStage = false;
-  isTransitioning = false;
+  resetScene1State();
 }

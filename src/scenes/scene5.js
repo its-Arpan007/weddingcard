@@ -70,7 +70,7 @@ function addSafeTimer(fn, delay) {
 function clearAllTimers() {
   activeTimers.forEach((item) => {
     if (typeof item === 'function') {
-      try { item(); } catch {}
+      try { item(); } catch { }
     } else {
       clearTimeout(item);
     }
@@ -452,13 +452,12 @@ export function initScene5() {
   // ─── Scene 6 Navigation Handoff ───────────────────────────────────────────
   const proceedToScene6 = () => {
     if (isTransitioning) return;
-    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
     isTransitioning = true;
 
     if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-      window.sceneManager.goToScene(6, 'down');
+      window.sceneManager.goToScene(6);
     } else {
-      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 6, direction: 'down' } }));
+      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 6 } }));
     }
 
     addSafeTimer(() => {
@@ -469,13 +468,12 @@ export function initScene5() {
   // ─── Scene 4 Navigation Return ────────────────────────────────────────────
   const proceedToScene4 = () => {
     if (isTransitioning) return;
-    if (window.sceneManager && window.sceneManager.isTransitioning()) return;
     isTransitioning = true;
 
     if (window.sceneManager && typeof window.sceneManager.goToScene === 'function') {
-      window.sceneManager.goToScene(4, 'up');
+      window.sceneManager.goToScene(4);
     } else {
-      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 4, direction: 'up' } }));
+      window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 4 } }));
     }
 
     addSafeTimer(() => {
