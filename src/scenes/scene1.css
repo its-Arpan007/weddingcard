@@ -675,11 +675,38 @@
 .title-stage-bg {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse at center 50%, rgba(68, 12, 24, 0.9) 0%, rgba(28, 4, 10, 0.96) 70%, #0a0104 100%),
-    linear-gradient(to bottom, rgba(10, 2, 5, 0.75) 0%, transparent 40%, rgba(10, 2, 5, 0.88) 100%),
-    url('/assets/scene-1/s1_background.png') center center / cover no-repeat;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   z-index: 0;
+  pointer-events: none;
+  background-color: #120206;
+}
+
+.title-stage-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(1.02);
+  animation: scene1-titleBgFloat 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes scene1-titleBgFloat {
+  0%   { transform: scale(1.02) translateY(0); }
+  50%  { transform: scale(1.045) translateY(-5px); }
+  100% { transform: scale(1.02) translateY(0); }
+}
+
+.title-stage-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center 48%, rgba(26, 3, 10, 0.52) 0%, rgba(20, 2, 7, 0.32) 48%, rgba(10, 1, 3, 0.58) 100%),
+    linear-gradient(to bottom, rgba(12, 1, 4, 0.45) 0%, transparent 22%, transparent 72%, rgba(10, 1, 3, 0.65) 100%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Rotating Warm Light Rays (Hardware-accelerated) */
@@ -693,35 +720,36 @@
   background: conic-gradient(
     from 0deg at 50% 50%,
     transparent 0deg,
-    rgba(245, 207, 104, 0.05) 15deg,
+    rgba(245, 207, 104, 0.04) 15deg,
     transparent 30deg,
-    rgba(245, 207, 104, 0.04) 45deg,
+    rgba(245, 207, 104, 0.03) 45deg,
     transparent 60deg,
-    rgba(245, 207, 104, 0.06) 75deg,
+    rgba(245, 207, 104, 0.05) 75deg,
     transparent 90deg,
-    rgba(245, 207, 104, 0.05) 105deg,
+    rgba(245, 207, 104, 0.04) 105deg,
     transparent 120deg,
-    rgba(245, 207, 104, 0.04) 135deg,
+    rgba(245, 207, 104, 0.03) 135deg,
     transparent 150deg,
-    rgba(245, 207, 104, 0.05) 165deg,
+    rgba(245, 207, 104, 0.04) 165deg,
     transparent 180deg,
-    rgba(245, 207, 104, 0.06) 195deg,
+    rgba(245, 207, 104, 0.05) 195deg,
     transparent 210deg,
-    rgba(245, 207, 104, 0.04) 225deg,
+    rgba(245, 207, 104, 0.03) 225deg,
     transparent 240deg,
-    rgba(245, 207, 104, 0.05) 255deg,
+    rgba(245, 207, 104, 0.04) 255deg,
     transparent 270deg,
-    rgba(245, 207, 104, 0.06) 285deg,
+    rgba(245, 207, 104, 0.05) 285deg,
     transparent 300deg,
-    rgba(245, 207, 104, 0.04) 315deg,
+    rgba(245, 207, 104, 0.03) 315deg,
     transparent 330deg,
-    rgba(245, 207, 104, 0.05) 345deg,
+    rgba(245, 207, 104, 0.04) 345deg,
     transparent 360deg
   );
   animation: scene1-rotateRays 60s linear infinite;
   pointer-events: none;
-  z-index: 1;
-  opacity: 0.8;
+  z-index: 2;
+  opacity: 0.65;
+  mix-blend-mode: screen;
   will-change: transform;
 }
 
@@ -743,29 +771,28 @@
 .wedding-title-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.4rem 1.4rem;
+  gap: 0.65rem;
+  padding: 0.45rem 1.6rem;
   border-radius: 9999px;
-  background: rgba(58, 6, 18, 0.75);
-  border: 1.5px solid rgba(245, 207, 104, 0.65);
+  background: rgba(58, 6, 18, 0.82);
+  border: 1.5px solid rgba(245, 207, 104, 0.7);
   box-shadow:
-    0 0 20px rgba(245, 207, 104, 0.25),
-    inset 0 1px 0 rgba(255, 245, 219, 0.3);
+    0 0 25px rgba(245, 207, 104, 0.3),
+    inset 0 1px 0 rgba(255, 245, 219, 0.35);
+  margin-bottom: 1.15rem;
   opacity: 0;
-  transform: translateY(-15px);
-  animation: scene1-titleFadeUp 1.0s cubic-bezier(0.2, 0.9, 0.3, 1) 0.2s forwards;
-  margin-bottom: 1rem;
+  will-change: transform, opacity;
 }
 
 .wedding-title-sparkle {
   color: #f5cf68;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
 .wedding-title-eyebrow {
   font-family: 'Cinzel', serif;
   font-weight: 600;
-  font-size: clamp(0.75rem, 2vw, 0.95rem);
+  font-size: clamp(0.78rem, 2vw, 0.96rem);
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: #f5cf68;
@@ -775,28 +802,41 @@
 /* 2. Divider */
 .wedding-title-divider {
   opacity: 0;
-  transform: scaleX(0.7);
-  animation: scene1-dividerExpand 1.0s cubic-bezier(0.2, 0.9, 0.3, 1) 0.5s forwards;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.35rem;
+  will-change: transform, opacity;
 }
 
 /* 3. THE GRAND WEDDING CELEBRATION */
 .wedding-title-main {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: clamp(1.65rem, 4.2vw, 3.1rem);
-  letter-spacing: 0.14em;
   text-transform: uppercase;
+  line-height: 1.28;
+  margin: 0 0 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.wedding-title-line1 {
+  display: block;
+  font-size: clamp(1.65rem, 4.4vw, 3.1rem);
+  letter-spacing: 0.16em;
   color: #fff6da;
-  background: linear-gradient(180deg, #ffffff 0%, #fff2c8 35%, #f5cf68 75%, #d4af37 100%);
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 18px rgba(245, 207, 104, 0.3));
+}
+
+.wedding-title-line2 {
+  display: block;
+  font-size: clamp(1.85rem, 5vw, 3.5rem);
+  letter-spacing: 0.22em;
+  background: linear-gradient(180deg, #ffffff 0%, #fff2c8 32%, #f5cf68 70%, #d4af37 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
-  line-height: 1.32;
-  margin-bottom: 1.15rem;
-  opacity: 0;
-  transform: translateY(18px);
-  animation: scene1-titleFadeUp 1.1s cubic-bezier(0.2, 0.9, 0.3, 1) 0.7s forwards;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 22px rgba(245, 207, 104, 0.45));
 }
 
 /* 4. Supporting Sentence */
@@ -804,22 +844,48 @@
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(1.05rem, 2.2vw, 1.4rem);
+  font-size: clamp(1.1rem, 2.3vw, 1.45rem);
   color: rgba(255, 248, 235, 0.96);
   letter-spacing: 0.04em;
   line-height: 1.65;
-  max-width: 580px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  max-width: 620px;
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.95),
+    0 0 12px rgba(212, 175, 55, 0.25);
+  margin: 0.25rem auto 1.15rem auto;
   opacity: 0;
-  transform: translateY(15px);
-  animation: scene1-titleFadeUp 1.1s cubic-bezier(0.2, 0.9, 0.3, 1) 0.9s forwards;
+  will-change: transform, opacity;
 }
 
+/* 5. Lotus Flourish */
 .wedding-title-lotus {
-  margin-top: 1.25rem;
-  font-size: 1.4rem;
+  font-size: 1.65rem;
   opacity: 0;
-  animation: scene1-titleFadeUp 1.0s ease-out 1.2s forwards;
+  filter: drop-shadow(0 0 14px rgba(245, 207, 104, 0.7));
+  margin-bottom: 1.75rem;
+  will-change: transform, opacity;
+}
+
+/* 6. Subtle Scroll / Tap Indicator */
+.wedding-title-scroll-hint {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgba(245, 207, 104, 0.8);
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.7rem, 1.6vw, 0.82rem);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: scene1-hintBounce 2.2s ease-in-out infinite;
+}
+
+@keyframes scene1-hintBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50% { transform: translateY(5px); opacity: 1; }
 }
 
 /* ==========================================================================

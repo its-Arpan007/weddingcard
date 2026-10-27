@@ -245,33 +245,55 @@ function showWeddingTitleStage() {
   const envelopeStage = document.getElementById('scene-1-envelope-stage');
   const titleStage = document.getElementById('wedding-title-stage');
 
-  if (titleStage) {
-    titleStage.setAttribute('aria-hidden', 'false');
-    titleStage.classList.add('active');
-  }
+  if (!titleStage) return;
+
+  titleStage.setAttribute('aria-hidden', 'false');
+  titleStage.classList.remove('transitioning-out', 'fading-out');
+  titleStage.classList.add('active');
+  titleStage.style.pointerEvents = 'auto';
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (prefersReducedMotion) {
-    if (envelopeStage) envelopeStage.classList.add('fading');
+    if (envelopeStage) {
+      envelopeStage.classList.add('fading');
+      envelopeStage.style.opacity = '0';
+      envelopeStage.style.pointerEvents = 'none';
+    }
+    titleStage.style.opacity = '1';
+    titleStage.querySelectorAll(
+      '.wedding-title-badge, .wedding-title-divider, .wedding-title-main, .wedding-title-sub, .wedding-title-lotus, .wedding-title-scroll-hint'
+    ).forEach((el) => {
+      el.style.opacity = '1';
+    });
   } else {
     const tl = gsap.timeline();
     if (envelopeStage) {
-      tl.to(envelopeStage, { opacity: 0, scale: 1.03, duration: 0.7, ease: 'power2.inOut' });
+      tl.to(envelopeStage, {
+        opacity: 0,
+        scale: 1.03,
+        duration: 0.75,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          envelopeStage.style.pointerEvents = 'none';
+        },
+      });
     }
-    tl.fromTo('.wedding-title-badge', { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '-=0.3')
-      .fromTo('.wedding-title-divider', { opacity: 0, scaleX: 0.5 }, { opacity: 1, scaleX: 1, duration: 0.7, ease: 'power2.out' }, '-=0.4')
-      .fromTo('.wedding-title-main', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, '-=0.5')
-      .fromTo('.wedding-title-sub', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '-=0.5')
-      .fromTo('.wedding-title-lotus', { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.5)' }, '-=0.4');
+    tl.to(titleStage, { opacity: 1, duration: 0.7, ease: 'power2.out' }, '-=0.5')
+      .fromTo('.wedding-title-badge', { opacity: 0, y: -22, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'back.out(1.4)' }, '-=0.35')
+      .fromTo('.wedding-title-divider', { opacity: 0, scaleX: 0.35 }, { opacity: 1, scaleX: 1, duration: 0.7, ease: 'power2.out' }, '-=0.45')
+      .fromTo('.wedding-title-main', { opacity: 0, y: 24, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: 'power2.out' }, '-=0.5')
+      .fromTo('.wedding-title-sub', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.75, ease: 'power2.out' }, '-=0.5')
+      .fromTo('.wedding-title-lotus', { opacity: 0, scale: 0.35, rotation: -20 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.75, ease: 'back.out(1.8)' }, '-=0.4')
+      .fromTo('.wedding-title-scroll-hint', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, '-=0.2');
   }
 
-  // Display Wedding Title Screen comfortably for ~3.8 seconds, then advance
+  // Display Wedding Title Screen comfortably (~4.5s), then advance to Scene 2
   addSafeTimer(() => {
-    if (!isTransitioning && !isDestroyed) {
+    if (!isTransitioning && !isDestroyed && inTitleStage) {
       proceedToScene2();
     }
-  }, 3800);
+  }, 4500);
 }
 
 function returnToEnvelopeStage() {
@@ -285,11 +307,13 @@ function returnToEnvelopeStage() {
   if (titleStage) {
     titleStage.classList.remove('active');
     titleStage.setAttribute('aria-hidden', 'true');
-    gsap.to(titleStage, { opacity: 0, duration: 0.4, ease: 'power2.out' });
+    titleStage.style.pointerEvents = 'none';
+    gsap.to(titleStage, { opacity: 0, duration: 0.45, ease: 'power2.out' });
   }
 
   if (envelopeStage) {
     envelopeStage.classList.remove('fading');
+    envelopeStage.style.pointerEvents = 'auto';
     gsap.to(envelopeStage, { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' });
   }
 }
@@ -297,6 +321,7 @@ function returnToEnvelopeStage() {
 function proceedToScene2() {
   if (isTransitioning || isDestroyed) return;
   isTransitioning = true;
+  clearAllTimers();
 
   const titleStage = document.getElementById('wedding-title-stage');
   if (titleStage) {
@@ -305,6 +330,8 @@ function proceedToScene2() {
       titleCard.classList.add('fading-out');
     }
     titleStage.classList.add('transitioning-out');
+    titleStage.style.pointerEvents = 'none';
+    gsap.to(titleStage, { opacity: 0, duration: 0.45, ease: 'power2.inOut' });
   }
 
   const flare = document.getElementById('scene1-flare');
@@ -318,7 +345,7 @@ function proceedToScene2() {
     } else {
       window.dispatchEvent(new CustomEvent('scene:navigate', { detail: { scene: 2 } }));
     }
-  }, 400);
+  }, 420);
 }
 
 // ─── Scene 1 Component HTML ──────────────────────────────────────────────────
@@ -820,7 +847,17 @@ export function createScene1() {
 
       <!-- STAGE 2: INTENTIONAL WEDDING TITLE SCREEN -->
       <div id="wedding-title-stage" class="scene-1-title-stage" aria-hidden="true" role="button" tabindex="0" aria-label="Click to proceed to Ganesh Ji blessings">
-        <div class="title-stage-bg"></div>
+        <div class="title-stage-bg">
+          <img
+            class="title-stage-bg-img"
+            src="/assets/scene-1/palace_lake_night.png"
+            alt="Royal Wedding Celebration Palace Lake"
+            loading="eager"
+            decoding="async"
+            draggable="false"
+          />
+          <div class="title-stage-vignette"></div>
+        </div>
         <div class="title-stage-rays" aria-hidden="true"></div>
 
         <div class="wedding-title-card">
@@ -850,13 +887,23 @@ export function createScene1() {
             </svg>
           </div>
 
-          <h2 class="wedding-title-main">THE GRAND WEDDING CELEBRATION</h2>
+          <h2 class="wedding-title-main">
+            <span class="wedding-title-line1">THE GRAND WEDDING</span>
+            <span class="wedding-title-line2">CELEBRATION</span>
+          </h2>
 
           <p class="wedding-title-sub">
-            As two hearts unite in a beautiful journey of love and togetherness
+            As two hearts unite in a beautiful journey of love and<br>togetherness
           </p>
 
           <div class="wedding-title-lotus" aria-hidden="true">🪷</div>
+
+          <div class="wedding-title-scroll-hint" aria-hidden="true">
+            <span>Scroll or Tap to Enter</span>
+            <svg width="18" height="10" viewBox="0 0 18 10" fill="none">
+              <path d="M1 1L9 8L17 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
         </div>
       </div>
 
@@ -884,6 +931,18 @@ export function resetScene1State() {
   const titleStage = document.getElementById('wedding-title-stage');
   const flare = document.getElementById('scene1-flare');
 
+  // Kill all existing tweens on Scene 1 elements
+  gsap.killTweensOf([
+    envelopeStage,
+    envelopeRig,
+    sealBtn,
+    topFlap,
+    card,
+    hintPill,
+    titleStage,
+    flare,
+  ]);
+
   // 1. Reset Envelope Stage
   if (envelopeStage) {
     envelopeStage.classList.remove('fading');
@@ -896,7 +955,10 @@ export function resetScene1State() {
   // 2. Reset Envelope Rig
   if (envelopeRig) {
     envelopeRig.classList.remove('envelope-open');
+    gsap.set(envelopeRig, { clearProps: 'all' });
     envelopeRig.style.transform = '';
+    envelopeRig.style.pointerEvents = 'auto';
+    envelopeRig.style.cursor = 'pointer';
     const specularOverlay = envelopeRig.querySelector('.gold-specular-overlay');
     if (specularOverlay) {
       specularOverlay.style.setProperty('--shimmer-x', '50%');
@@ -911,6 +973,7 @@ export function resetScene1State() {
     sealBtn.style.opacity = '1';
     sealBtn.style.display = 'block';
     sealBtn.style.pointerEvents = 'auto';
+    sealBtn.style.cursor = 'pointer';
   }
 
   // 4. Reset Top Flap Hinge
@@ -937,21 +1000,23 @@ export function resetScene1State() {
   if (titleStage) {
     titleStage.classList.remove('active', 'transitioning-out', 'fading-out');
     titleStage.setAttribute('aria-hidden', 'true');
-    gsap.set(titleStage, { clearProps: 'all' });
+    gsap.killTweensOf(titleStage);
     titleStage.style.opacity = '0';
     titleStage.style.pointerEvents = 'none';
 
     const titleCard = titleStage.querySelector('.wedding-title-card');
     if (titleCard) {
       titleCard.classList.remove('fading-out');
+      gsap.killTweensOf(titleCard);
       gsap.set(titleCard, { clearProps: 'all' });
     }
 
     const titleChildren = titleStage.querySelectorAll(
-      '.wedding-title-badge, .wedding-title-divider, .wedding-title-main, .wedding-title-sub, .wedding-title-lotus'
+      '.wedding-title-badge, .wedding-title-divider, .wedding-title-main, .wedding-title-sub, .wedding-title-lotus, .wedding-title-scroll-hint'
     );
     titleChildren.forEach((el) => {
-      gsap.set(el, { clearProps: 'all' });
+      gsap.killTweensOf(el);
+      gsap.set(el, { opacity: 0, clearProps: 'transform' });
     });
   }
 
@@ -1254,11 +1319,11 @@ export function initScene1() {
       }, '-=0.6');
     }
 
-    // Phase 2: After user admires opened envelope (~2.6s),
-    // smoothly crossfade to the Wedding Title Screen
+    // Phase 2: After user admires opened envelope card (~2.2s),
+    // smoothly crossfade into the Wedding Title Screen
     addSafeTimer(() => {
       showWeddingTitleStage();
-    }, 2600);
+    }, 2200);
   };
 
   const handleTitleClick = (e) => {

@@ -336,9 +336,9 @@ export function createScene5() {
               id="scene-5-next-btn"
               class="scene-5-cta-btn"
               type="button"
-              aria-label="Proceed to Wedding Blessings and RSVP"
+              aria-label="Proceed to Wedding Blessings"
             >
-              <span>Send Blessings &amp; RSVP</span>
+              <span>Send Blessings</span>
               <span class="scene-5-cta-arrow" aria-hidden="true">▾</span>
             </button>
             <span class="scene-5-scroll-hint" aria-hidden="true">Scroll down or click to continue</span>

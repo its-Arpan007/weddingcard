@@ -1,6 +1,6 @@
 /* ==========================================================================
    ROYAL BACKGROUND MUSIC CONTROLLER & SPEAKER BUTTON
-   Songs: "Aaj Se Teri" (Pad Man) & "Kudmayi" (Rocky Aur Rani Kii Prem Kahaani)
+   Song: Wedding Shehnai (Ustad Bismillah Khan - Mangal Parinay)
    Continuous, Uniform, Seamless, and Resilient Across All Scene Transitions
    ========================================================================== */
 
@@ -16,91 +16,6 @@
   pointer-events: auto;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-}
-
-/* Glassmorphism Song Info & Track Switcher Pill */
-.royal-music-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.35rem 0.75rem 0.35rem 0.85rem;
-  border-radius: 9999px;
-  background: rgba(30, 4, 12, 0.88);
-  border: 1.2px solid rgba(245, 207, 104, 0.6);
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.55),
-    inset 0 1px 1px rgba(255, 245, 210, 0.25);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #f7d57f;
-  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-  font-family: 'Cinzel', serif;
-}
-
-.royal-music-pill:hover {
-  border-color: rgba(245, 207, 104, 0.9);
-  background: rgba(45, 6, 18, 0.94);
-  box-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.65),
-    0 0 14px rgba(245, 207, 104, 0.35);
-}
-
-.royal-music-track-note {
-  font-size: 0.85rem;
-  color: #f5cf68;
-  display: inline-block;
-  animation: musicNoteWiggle 3.2s ease-in-out infinite;
-}
-
-.royal-music-container.muted .royal-music-track-note {
-  animation: none;
-  opacity: 0.5;
-}
-
-@keyframes musicNoteWiggle {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-1.5px) rotate(-6deg); }
-  75% { transform: translateY(1px) rotate(5deg); }
-}
-
-.royal-music-track-name {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #fff2c8;
-  white-space: nowrap;
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-}
-
-/* Track Skip / Switch Button */
-.royal-music-skip-btn {
-  background: none;
-  border: none;
-  padding: 2px 4px;
-  margin: 0;
-  cursor: pointer;
-  color: #f5cf68;
-  opacity: 0.8;
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease, opacity 0.2s ease, color 0.2s ease;
-  outline: none;
-}
-
-.royal-music-skip-btn:hover {
-  opacity: 1;
-  color: #ffffff;
-  transform: scale(1.2);
-}
-
-.royal-music-skip-btn:active {
-  transform: scale(0.9);
 }
 
 /* Master Speaker Medallion Button */
@@ -252,7 +167,7 @@
 .royal-music-tooltip {
   position: absolute;
   top: 100%;
-  right: 0;
+  right: 50%;
   margin-top: 8px;
   white-space: nowrap;
   font-family: 'Cinzel', serif;
@@ -268,13 +183,13 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.65);
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-4px);
+  transform: translateX(50%) translateY(-4px);
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .royal-music-container:hover .royal-music-tooltip {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(50%) translateY(0);
 }
 
 /* Responsive adjustments for mobile screens */
@@ -282,7 +197,6 @@
   .royal-music-container {
     top: max(0.85rem, env(safe-area-inset-top, 0.85rem));
     right: max(0.85rem, env(safe-area-inset-right, 0.85rem));
-    gap: 0.4rem;
   }
 
   .royal-music-btn {
@@ -298,26 +212,7 @@
     height: 19px;
   }
 
-  .royal-music-pill {
-    padding: 0.25rem 0.6rem 0.25rem 0.7rem;
-  }
-
-  .royal-music-track-name {
-    font-size: 0.64rem;
-    max-width: 100px;
-  }
-
   .royal-music-tooltip {
     display: none;
-  }
-}
-
-@media (max-width: 420px) {
-  .royal-music-pill {
-    padding: 0.25rem 0.45rem;
-  }
-
-  .royal-music-track-name {
-    max-width: 82px;
   }
 }

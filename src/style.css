@@ -48,15 +48,33 @@ body {
   height: 100%;
   overflow: hidden;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-  will-change: opacity;
+  z-index: 1;
+  transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.6s;
+  will-change: opacity, transform;
   transform: translateZ(0);
 }
 
 .scene.active {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
+  z-index: 10;
+}
+
+.scene.enter-from-down,
+.scene.enter-from-up,
+.scene.exit-up,
+.scene.exit-down {
+  visibility: visible;
+  z-index: 5;
+}
+
+/* Ensure no child of an inactive scene can ever receive pointer events */
+.scene:not(.active),
+.scene:not(.active) * {
+  pointer-events: none !important;
 }
 
 /* Utility: reduced motion */

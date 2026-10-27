@@ -62,7 +62,7 @@ export function goToScene(sceneNum, forcedDirection = null) {
   if (navigationCooldownTimer) clearTimeout(navigationCooldownTimer);
   if (inertiaUnlockTimer) clearTimeout(inertiaUnlockTimer);
 
-  // Ensure target DOM element exists
+  // Ensure target DOM element exists and is unhidden
   let targetEl = document.getElementById(`scene-${sceneNum}`);
   if (!targetEl) {
     const content = targetDef.create();
@@ -74,6 +74,11 @@ export function goToScene(sceneNum, forcedDirection = null) {
     targetEl = document.getElementById(`scene-${sceneNum}`);
   }
 
+  if (targetEl) {
+    targetEl.style.display = '';
+    targetEl.style.visibility = 'visible';
+  }
+
   const prevEl = prevSceneNum ? document.getElementById(`scene-${prevSceneNum}`) : null;
 
   if (!prevEl) {
@@ -81,6 +86,8 @@ export function goToScene(sceneNum, forcedDirection = null) {
     if (targetEl) {
       targetEl.classList.remove('enter-from-down', 'enter-from-up', 'exit-up', 'exit-down');
       targetEl.classList.add('active');
+      targetEl.style.display = '';
+      targetEl.style.visibility = 'visible';
     }
     try {
       targetDef.init(direction);
@@ -122,8 +129,21 @@ export function goToScene(sceneNum, forcedDirection = null) {
 
   // After CSS visual transition completes (700ms):
   navigationCooldownTimer = setTimeout(() => {
+    // Cleanly isolate pointer events: hide all scenes that are not currentScene
+    document.querySelectorAll('.scene').forEach((sc) => {
+      if (sc.id !== `scene-${currentScene}`) {
+        sc.classList.remove('active', 'exit-up', 'exit-down', 'enter-from-down', 'enter-from-up');
+        sc.style.display = 'none';
+        sc.style.visibility = 'hidden';
+      } else {
+        sc.classList.remove('exit-up', 'exit-down', 'enter-from-down', 'enter-from-up');
+        sc.classList.add('active');
+        sc.style.display = '';
+        sc.style.visibility = 'visible';
+      }
+    });
+
     if (prevEl && prevSceneNum !== currentScene) {
-      prevEl.classList.remove('exit-up', 'exit-down');
       // Cleanly suspend outgoing scene's animation loops (keeping DOM rendered & intact)
       if (scenes[prevSceneNum] && typeof scenes[prevSceneNum].destroy === 'function') {
         try {
@@ -134,10 +154,10 @@ export function goToScene(sceneNum, forcedDirection = null) {
       }
     }
 
-    // Cooldown lock window: absorb residual wheel momentum or touch bounce (200ms)
+    // Cooldown lock window: absorb residual wheel momentum or touch bounce (150ms)
     inertiaUnlockTimer = setTimeout(() => {
       isNavigating = false;
-    }, 200);
+    }, 150);
   }, 720);
 }
 

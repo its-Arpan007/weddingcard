@@ -1,6 +1,6 @@
 /**
  * Royal Background Music Manager
- * Songs: "Aaj Se Teri" (Pad Man) & "Kudmayi" (Rocky Aur Rani Kii Prem Kahaani)
+ * Song: Wedding Shehnai (Ustad Bismillah Khan - Mangal Parinay)
  * Continuous, Uniform, Seamless, and Resilient Across All Scene Transitions
  */
 
@@ -8,18 +8,11 @@ import './audio.css';
 
 const PLAYLIST = [
   {
-    id: 'aaj-se-teri',
-    title: 'Aaj Se Teri',
-    film: 'Pad Man',
-    artist: 'Arijit Singh',
-    src: '/assets/audio/aaj_se_teri.mp3',
-  },
-  {
-    id: 'kudmayi',
-    title: 'Kudmayi',
-    film: 'Rocky Aur Rani',
-    artist: 'Shahid Mallya',
-    src: '/assets/audio/kudmayi.mp3',
+    id: 'wedding-shehnai',
+    title: 'Wedding Shehnai',
+    film: 'Mangal Parinay',
+    artist: 'Ustad Bismillah Khan',
+    src: '/assets/audio/wedding_shehnai.mp3',
   },
 ];
 
@@ -78,15 +71,10 @@ function fadeVolume(audio, target, durationMs = 700, onDone = null) {
 }
 
 /**
- * Updates UI with current track info and playback state
+ * Updates UI with playback state
  */
 function updateUI() {
   if (!musicContainer) return;
-  const track = PLAYLIST[currentTrackIndex];
-
-  if (trackNameEl) {
-    trackNameEl.textContent = track.title;
-  }
 
   const speakerBtn = musicContainer.querySelector('.royal-music-btn');
 
@@ -94,21 +82,21 @@ function updateUI() {
     musicContainer.classList.remove('muted');
     musicContainer.classList.add('playing');
     if (speakerBtn) {
-      speakerBtn.setAttribute('aria-label', `Mute music (Playing: ${track.title})`);
-      speakerBtn.setAttribute('title', `Mute music (Playing: ${track.title})`);
+      speakerBtn.setAttribute('aria-label', 'Mute wedding music');
+      speakerBtn.setAttribute('title', 'Mute Music');
     }
     if (tooltipEl) {
-      tooltipEl.textContent = `Playing: ${track.title} • Click to Mute`;
+      tooltipEl.textContent = 'Mute Music';
     }
   } else {
     musicContainer.classList.remove('playing');
     musicContainer.classList.add('muted');
     if (speakerBtn) {
-      speakerBtn.setAttribute('aria-label', `Play music (${track.title})`);
-      speakerBtn.setAttribute('title', `Play music (${track.title})`);
+      speakerBtn.setAttribute('aria-label', 'Play wedding music');
+      speakerBtn.setAttribute('title', 'Play Music');
     }
     if (tooltipEl) {
-      tooltipEl.textContent = `Muted (${track.title}) • Click to Play`;
+      tooltipEl.textContent = 'Play Music';
     }
   }
 }
@@ -221,35 +209,23 @@ export function initAudioManager() {
   audioElement.id = 'royal-wedding-audio';
   audioElement.src = PLAYLIST[0].src;
   audioElement.preload = 'auto';
+  audioElement.loop = true;
   audioElement.volume = 0;
   audioElement.setAttribute('aria-hidden', 'true');
   document.body.appendChild(audioElement);
 
-  // Automatically advance to next song when current finishes
+  // Automatically replay when song finishes
   audioElement.addEventListener('ended', () => {
-    nextTrack();
+    audioElement.currentTime = 0;
+    audioElement.play().catch(() => {});
   });
 
-  // 2. Speaker Controller & Playlist Container
+  // 2. Speaker Controller Medallion Container
   musicContainer = document.createElement('div');
   musicContainer.id = 'royal-music-container';
   musicContainer.className = 'royal-music-container muted';
 
   musicContainer.innerHTML = `
-    <!-- Song Info & Next Track Switcher Pill -->
-    <div class="royal-music-pill" role="status" aria-live="polite">
-      <span class="royal-music-track-note" aria-hidden="true">♪</span>
-      <span class="royal-music-track-name">${PLAYLIST[0].title}</span>
-      <button
-        type="button"
-        class="royal-music-skip-btn"
-        aria-label="Skip to next song"
-        title="Switch Song (Aaj Se Teri / Kudmayi)"
-      >
-        ⏭
-      </button>
-    </div>
-
     <!-- Master Speaker Medallion Button -->
     <button
       id="royal-music-btn"
@@ -275,16 +251,13 @@ export function initAudioManager() {
       </span>
     </button>
 
-    <div class="royal-music-tooltip" aria-hidden="true">Playing: Aaj Se Teri • Click to Mute</div>
+    <div class="royal-music-tooltip" aria-hidden="true">Mute Music</div>
   `;
 
   document.body.appendChild(musicContainer);
 
-  trackNameEl = musicContainer.querySelector('.royal-music-track-name');
   tooltipEl = musicContainer.querySelector('.royal-music-tooltip');
   const speakerBtn = musicContainer.querySelector('.royal-music-btn');
-  const skipBtn = musicContainer.querySelector('.royal-music-skip-btn');
-  const pillEl = musicContainer.querySelector('.royal-music-pill');
 
   // 3. Speaker Button Click / Keyboard (Toggles Mute / Unmute)
   if (speakerBtn) {
@@ -302,26 +275,7 @@ export function initAudioManager() {
     });
   }
 
-  // 4. Skip Button Click (Switches between Aaj Se Teri and Kudmayi)
-  if (skipBtn) {
-    skipBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      nextTrack();
-    });
-  }
-
-  // Clicking pill also skips to next track
-  if (pillEl) {
-    pillEl.addEventListener('click', (e) => {
-      // If clicking inside skipBtn, let skipBtn handle it
-      if (e.target.closest('.royal-music-skip-btn')) return;
-      nextTrack();
-    });
-    pillEl.style.cursor = 'pointer';
-    pillEl.setAttribute('title', 'Click to switch between Aaj Se Teri & Kudmayi');
-  }
-
-  // 5. Autoplay on initial load (if allowed by browser policy)
+  // 4. Autoplay on initial load (if allowed by browser policy)
   playAudio();
 
   // 6. Automatic Audio Unlock on First User Gesture anywhere on page
